@@ -94,8 +94,7 @@ namespace MLProject1
 
         public static void SaveImage(Image image, string path)
         {
-            Bitmap aux = new Bitmap(image);
-            aux.Save(path, ImageFormat.Jpeg);
+            image.Save(path, ImageFormat.Jpeg);
         }
 
         private static bool IsWhite(Color pixel)
@@ -220,16 +219,16 @@ namespace MLProject1
             SaveImage(resized, path);
         }
 
-        private static void RemoveWhiteDataset()
+        public static void RemoveWhiteDataset()
         {
             int i = 0;
             foreach (string type in new List<string>() { "Alphabet Training", "Alphabet Testing", "Alphabet Validation" })
             {
-                Directory.CreateDirectory("new\\" + type);
+                Directory.CreateDirectory("new\\Square\\" + type);
 
                 foreach (char c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
                 {
-                    Directory.CreateDirectory("new\\" + type + "\\" + c);
+                    Directory.CreateDirectory("new\\Square\\" + type + "\\" + c);
 
                     string[] files = Directory.GetFiles(Environment.CurrentDirectory + "\\data\\" + type + "\\" + c);
 
@@ -237,7 +236,7 @@ namespace MLProject1
                     {
                         using (Image img = Image.FromFile(file))
                         {
-                            ImageProcessing.CropWhite(img, "new\\" + type + "\\" + c + "\\image" + i + ".jpg", 100, 75);
+                            ImageProcessing.CropWhite(img, "new\\Square\\" + type + "\\" + c + "\\image" + i + ".jpg", 75, 75);
                             i++;
                         }
                     }
@@ -245,44 +244,146 @@ namespace MLProject1
             }
         }
 
-        public static RGBPixel[,] GetRGBMatrix(Bitmap image)
+        //private static RGBPixel[,] GetRGBMatrix(Bitmap image)
+        //{
+        //    int width = image.Width, height = image.Height;
+
+        //    RGBPixel[,] result = new RGBPixel[height, width];
+
+        //    for (int i = 0; i < height; i++)
+        //    {
+        //        for (int j = 0; j < width; j++)
+        //        {
+        //            Color color = image.GetPixel(j, i);
+        //            result[i, j] = new RGBPixel(color.R, color.G, color.B);
+        //        }
+        //    }
+
+        //    return result;
+        //}
+
+        //private static Bitmap ReconstructFromRGBMatrix(RGBPixel[,] imageMatrix)
+        //{
+        //    int width = imageMatrix.GetLength(1), height = imageMatrix.GetLength(0);
+
+        //    Bitmap image = new Bitmap(width, height);
+        //    using (Graphics graph = Graphics.FromImage(image))
+        //    {
+        //        Rectangle rectangle = new Rectangle(0, 0, width, height);
+        //        graph.FillRectangle(Brushes.White, rectangle);
+        //    }
+
+        //    for (int i = 0; i < height; i++)
+        //    {
+        //        for (int j = 0; j < width; j++)
+        //        {
+        //            image.SetPixel(j, i, Color.FromArgb((int)imageMatrix[i, j].Red, (int)imageMatrix[i, j].Green, (int)imageMatrix[i, j].Blue));
+        //        }
+        //    }
+
+        //    return image;
+        //}
+
+        //public static Bitmap ReconstructFromNormalizedRGBMatrix(RGBPixel[,] imageMatrix)
+        //{
+        //    return ReconstructFromRGBMatrix(DenormalizeRGBMatrix(imageMatrix));
+        //}
+
+        //private static RGBPixel[,] DenormalizeRGBMatrix(RGBPixel[,] imageMatrix)
+        //{
+        //    for (int i = 0; i < imageMatrix.GetLength(0); i++)
+        //    {
+        //        for (int j = 0; j < imageMatrix.GetLength(1); j++)
+        //        {
+        //            imageMatrix[i, j] = DenormalizePixel(imageMatrix[i, j]);
+        //        }
+        //    }
+
+        //    return imageMatrix;
+        //}
+
+        //private static double DenormalizeValue(double value)
+        //{
+        //    return (int)(value * 255);
+        //}
+
+        //private static RGBPixel DenormalizePixel(RGBPixel pixel)
+        //{
+        //    return new RGBPixel(DenormalizeValue(pixel.Red), DenormalizeValue(pixel.Green), DenormalizeValue(pixel.Blue));
+        //}
+
+        //private static double NormalizeValue(double value)
+        //{
+        //    return value / 255.0;
+        //}
+
+        //private static RGBPixel NormalizePixel(RGBPixel pixel)
+        //{
+        //    return new RGBPixel(NormalizeValue(pixel.Red), NormalizeValue(pixel.Green), NormalizeValue(pixel.Blue));
+        //}
+
+        //private static RGBPixel[,] NormalizeRGBMatrix(RGBPixel[,] imageMatrix)
+        //{
+        //    for(int i = 0; i < imageMatrix.GetLength(0); i++)
+        //    {
+        //        for(int j = 0; j < imageMatrix.GetLength(1); j++)
+        //        {
+        //            imageMatrix[i, j] = NormalizePixel(imageMatrix[i,j]);
+        //        }
+        //    }
+
+        //    return imageMatrix;
+        //}
+
+        //public static RGBPixel[,] GetNormalizedRGBMatrix(string path)
+        //{
+        //    using (Bitmap bmp = new Bitmap(path))
+        //    {
+        //        return NormalizeRGBMatrix(GetRGBMatrix(bmp));
+        //    }
+        //}
+
+        //public static RGBPixel[,] GetNormalizedRGBMatrix(Bitmap bitmap)
+        //{
+        //    using (Bitmap bmp = new Bitmap(bitmap))
+        //    {
+        //        return NormalizeRGBMatrix(GetRGBMatrix(bmp));
+        //    }
+        //}
+
+        public static FilteredImage GetNormalizedFilteredImage(Bitmap bitmap)
         {
-            int width = image.Width, height = image.Height;
-
-            RGBPixel[,] result = new RGBPixel[height, width];
-
-            for (int i = 0; i < height; i++)
+            using (Bitmap bmp = new Bitmap(bitmap))
             {
-                for (int j = 0; j < width; j++)
+                int height = bitmap.Height;
+
+                FilteredImageChannel[] channels = new FilteredImageChannel[3];
+
+                double[,] redChannel = new double[height, height];
+                double[,] greenChannel = new double[height, height];
+                double[,] blueChannel = new double[height, height];
+                
+
+                for (int i = 0; i < bitmap.Height; i++)
                 {
-                    Color color = image.GetPixel(j, i);
-                    result[i, j] = new RGBPixel(color.R, color.G, color.B);
+                    for (int j = 0; j < bitmap.Height; j++)
+                    {
+                        Color color = bitmap.GetPixel(j, i);
+                        redChannel[i, j] = color.R / 255.0;
+                        greenChannel[i, j] = color.G / 255.0;
+                        blueChannel[i, j] = color.B / 255.0;
+                    }
                 }
+
+                channels[0] = new FilteredImageChannel(height, redChannel);
+                channels[1] = new FilteredImageChannel(height, greenChannel);
+                channels[2] = new FilteredImageChannel(height, blueChannel);
+
+
+                FilteredImage image = new FilteredImage(3, channels);
+
+                return image;
             }
-
-            return result;
-        }
-
-        public static Bitmap ReconstructFromRGBMatrix(RGBPixel[,] imageMatrix)
-        {
-            int width = imageMatrix.GetLength(1), height = imageMatrix.GetLength(0);
-
-            Bitmap image = new Bitmap(width, height);
-            using (Graphics graph = Graphics.FromImage(image))
-            {
-                Rectangle rectangle = new Rectangle(0, 0, width, height);
-                graph.FillRectangle(Brushes.White, rectangle);
-            }
-
-            for (int i = 0; i < height; i++)
-            {
-                for (int j = 0; j < width; j++)
-                {
-                    image.SetPixel(j, i, Color.FromArgb(imageMatrix[i, j].Red, imageMatrix[i, j].Green, imageMatrix[i, j].Blue));
-                }
-            }
-
-            return image;
         }
     }
 }

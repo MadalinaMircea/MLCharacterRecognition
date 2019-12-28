@@ -33,7 +33,7 @@ namespace MLProject1
         {
             InitializeComponent();
             //network = new KerasNeuralNetwork("modelJson2.json", "modelWeights2.h5");
-            network = new ConvolutionalNeuralNetwork("newJson.json", "modelWeights5.h5");
+            //network = new ConvolutionalNeuralNetwork("newJson.json", "modelWeights5.h5");
 
             //string datasetPath = "data/new";
             //H5FileId fileId = H5F.open("tryToRead.h5", H5F.OpenMode.ACC_RDONLY);
@@ -52,9 +52,9 @@ namespace MLProject1
             //    gch.Free();
             //}
 
-
-
-
+            CNNController controller = new CNNController();
+            network = controller.CreateModel();
+            network.Compile();
 
             //H5FileId fileId = H5F.open("tryToRead.h5", H5F.OpenMode.ACC_RDONLY);
 
@@ -68,6 +68,10 @@ namespace MLProject1
             //H5Array<float> array = new H5Array<float>(arr);
 
             //H5D.read<float>(datasetId, datatypeId, array);
+
+            
+
+            
 
             ClearPicture();
 
@@ -130,12 +134,10 @@ namespace MLProject1
         {
             string path = Environment.CurrentDirectory + "\\image.jpg";
 
-            ImageProcessing.CropWhite(pictureBox1.Image, path, 100, 75);
+            ImageProcessing.CropWhite(pictureBox1.Image, path, 75, 75);
 
-            ImageProcessing.SaveImage(ImageProcessing.ReconstructFromRGBMatrix(ImageProcessing.GetRGBMatrix(new Bitmap(path))),
-                Environment.CurrentDirectory + "\\image1.jpg");
+            predictionLabel.Text = network.RecogniseImage(path).ToString();
 
-            //predictionLabel.Text = network.RecogniseImage(path).ToString();
 
             ClearPicture();
         }

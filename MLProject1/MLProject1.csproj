@@ -65,25 +65,30 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CNNController.cs" />
+    <Compile Include="CNN\FilteredImage.cs" />
+    <Compile Include="CNN\FilteredImageChannel.cs" />
+    <Compile Include="CNN\FlattenedImage.cs" />
+    <Compile Include="CNN\Kernel.cs" />
+    <Compile Include="CNN\LayerOutput.cs" />
     <Compile Include="CNN\RGBPixel.cs" />
     <Compile Include="CNN\Unit.cs" />
-    <Compile Include="CNN\IActivation.cs" />
+    <Compile Include="CNN\Activation.cs" />
     <Compile Include="CNN\ConvolutionalLayer.cs" />
     <Compile Include="CNN\ConvolutionalNeuralNetwork.cs" />
     <Compile Include="CNN\DenseLayer.cs" />
     <Compile Include="CNN\DropoutLayer.cs" />
-    <Compile Include="CNN\Feature.cs" />
+    <Compile Include="CNN\Filter.cs" />
     <Compile Include="CNN\FlattenLayer.cs" />
     <Compile Include="CNN\InputLayer.cs" />
     <Compile Include="CNN\JsonHelper.cs" />
     <Compile Include="CNN\MaxPoolingLayer.cs" />
-    <Compile Include="CNN\INetworkLayer.cs" />
     <Compile Include="CNN\NetworkLayer.cs" />
     <Compile Include="CNN\Neuron.cs" />
     <Compile Include="CNN\OutputLayer.cs" />
     <Compile Include="CNN\ReluActivation.cs" />
     <Compile Include="CNN\SoftmaxActivation.cs" />
     <Compile Include="CNN\Weight.cs" />
+    <Compile Include="CNN\WeightType.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -15,9 +15,6 @@ namespace MLProject1.CNN
         public InputLayer Input { get; }
         public List<NetworkLayer> NetworkLayers { get; }
         public OutputLayer Output { get; }
-
-        
-
         public ConvolutionalNeuralNetwork(string modelFile, string weightsFile)
         {
             ConvolutionalNeuralNetwork item = LoadJson(modelFile);
@@ -38,6 +35,7 @@ namespace MLProject1.CNN
         {
             Input = new InputLayer(inputWidth, inputHeight);
             Output = new OutputLayer(outputSize);
+            NetworkLayers = new List<NetworkLayer>();
         }
 
         public void Add(NetworkLayer layer)
@@ -57,9 +55,13 @@ namespace MLProject1.CNN
 
         public char RecogniseImage(string path)
         {
-            Bitmap image = new Bitmap(path);
+            Input.SetInputImage(path);
 
-            RGBPixel[,] imageMatrix = ImageProcessing.GetRGBMatrix(image);
+            foreach(NetworkLayer layer in NetworkLayers)
+            {
+                layer.ComputeOutput();
+            }
+
 
             return 'A';
         }
@@ -72,6 +74,24 @@ namespace MLProject1.CNN
                 ConvolutionalNeuralNetwork item = JsonConvert.DeserializeObject<ConvolutionalNeuralNetwork>(json);
 
                 return item;
+            }
+        }
+
+        public void Compile()
+        {
+            Input.CompileLayer(null);
+            if (NetworkLayers.Count == 0)
+            {
+                Output.PreviousLayer = Input;
+            }
+            else
+            {
+                NetworkLayers[0].CompileLayer(Input);
+                for (int i = 1; i < NetworkLayers.Count; i++)
+                {
+                    NetworkLayers[i].CompileLayer(NetworkLayers[i - 1]);
+                }
+                Output.CompileLayer(NetworkLayers[NetworkLayers.Count - 1]);
             }
         }
 

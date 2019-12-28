@@ -148,6 +148,35 @@ namespace MLProject1
             return newModel;
         }
 
+        private Sequential CreateModel4()
+        {
+            int imgWidth = 75;
+            int imgHeight = 75;
+
+            Shape inputShape;
+
+            if (Backend.ImageDataFormat() == "channels_first")
+                inputShape = new Shape(3, imgHeight, imgWidth);
+            else
+                inputShape = new Shape(imgHeight, imgWidth, 3);
+
+            Sequential newModel = new Sequential();
+            newModel.Add(new Conv2D(32, new Tuple<int, int>(10, 10), input_shape: inputShape, activation: "relu"));
+            newModel.Add(new MaxPooling2D());
+            newModel.Add(new Conv2D(64, new Tuple<int, int>(10, 10), input_shape: inputShape, activation: "relu"));
+            newModel.Add(new MaxPooling2D());
+            newModel.Add(new Dropout(0.2));
+            newModel.Add(new Conv2D(128, new Tuple<int, int>(5, 5), input_shape: inputShape, activation: "relu"));
+            newModel.Add(new Flatten());
+            newModel.Add(new Dense(512, activation: "relu"));
+            newModel.Add(new Dropout(0.5));
+            newModel.Add(new Dense(26, activation: "softmax"));
+
+            newModel.Compile(loss: "categorical_crossentropy", optimizer: "adam", metrics: new string[] { "accuracy" });
+
+            return newModel;
+        }
+
         private Sequential FitAndEvaluate(Sequential newModel)
         {
             int imgWidth = 100;

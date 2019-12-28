@@ -9,19 +9,34 @@ namespace MLProject1.CNN
 {
     class MaxPoolingLayer : NetworkLayer
     {
-        public int PoolWidth { get; }
-        public int PoolHeight { get; }
-        public MaxPoolingLayer() : base("MaxPooling")
-        {
-            PoolWidth = 2;
-            PoolHeight = 2;
-        }
+        public int Pool { get; }
+
+        public FilteredImage Output { get; set; }
 
         [JsonConstructor]
-        public MaxPoolingLayer(int poolWidth, int poolHeight) : base("MaxPooling")
+        public MaxPoolingLayer(int pool = 2) : base("MaxPooling")
         {
-            PoolWidth = poolWidth;
-            PoolHeight = poolHeight;
+            Pool = pool;
+        }
+
+        public override void ComputeOutput()
+        {
+            for(int i = 0; i < Output.NumberOfChannels; i++)
+            {
+
+            }
+        }
+
+        public override LayerOutput GetData()
+        {
+            return Output;
+        }
+
+        public override void CompileLayer(NetworkLayer previousLayer)
+        {
+            PreviousLayer = previousLayer;
+            int weights = previousLayer.GetData().NumberOfWeights;
+            Output = new FilteredImage(weights, new FilteredImageChannel[weights]);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    interface IActivation
+    class WeightType
     {
     }
 }

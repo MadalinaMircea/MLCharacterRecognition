@@ -9,9 +9,9 @@ namespace MLProject1
 {
     class CNNController
     {
-        public void CreateModel()
+        public ConvolutionalNeuralNetwork CreateModel()
         {
-            int imgWidth = 100;
+            int imgWidth = 75;
             int imgHeight = 75;
             int outputSize = 26;
 
@@ -19,16 +19,18 @@ namespace MLProject1
             SoftmaxActivation softmaxActivation = new SoftmaxActivation();
 
             ConvolutionalNeuralNetwork newModel = new ConvolutionalNeuralNetwork(imgWidth, imgHeight, outputSize);
-            newModel.Add(new ConvolutionalLayer(32, 10, 10, reluActivation));
+            newModel.Add(new ConvolutionalLayer(32, 7, reluActivation));
             newModel.Add(new MaxPoolingLayer());
-            newModel.Add(new ConvolutionalLayer(64, 10, 10, reluActivation)); ;
+            newModel.Add(new ConvolutionalLayer(64, 5, reluActivation));
             newModel.Add(new MaxPoolingLayer());
             newModel.Add(new DropoutLayer(0.2));
-            newModel.Add(new ConvolutionalLayer(128, 5, 5, reluActivation));
+            newModel.Add(new ConvolutionalLayer(128, 5, reluActivation));
             newModel.Add(new FlattenLayer());
             newModel.Add(new DenseLayer(512, reluActivation));
             newModel.Add(new DropoutLayer(0.5));
             newModel.Add(new DenseLayer(26, softmaxActivation));
+
+            return newModel;
         }
     }
 }

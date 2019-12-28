@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    interface INetworkLayer
+    class LayerOutput
     {
+        public int NumberOfWeights { get; set; }
     }
 }

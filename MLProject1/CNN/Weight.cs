@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class Weight
+    class Weight : WeightType
     {
         public Unit FromUnit { get; }
         public int Value { get; }

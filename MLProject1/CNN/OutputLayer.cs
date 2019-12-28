@@ -7,13 +7,31 @@ using System.Threading.Tasks;
 namespace MLProject1.CNN
 {
     [Serializable]
-    class OutputLayer
+    class OutputLayer : NetworkLayer
     {
         public int Size { get; set; }
 
-        public OutputLayer(int size)
+        public FlattenedImage Output { get; set; }
+
+        public OutputLayer(int size) : base("Output")
         {
             Size = size;
+        }
+
+        public override void ComputeOutput()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override LayerOutput GetData()
+        {
+            return Output;
+        }
+
+        public override void CompileLayer(NetworkLayer previousLayer)
+        {
+            PreviousLayer = previousLayer;
+            Output = new FlattenedImage(Size);
         }
     }
 }

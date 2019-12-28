@@ -13,10 +13,20 @@ namespace MLProject1.CNN
     {
         public string Type { get; }
 
+        public NetworkLayer PreviousLayer { get; set; }
+
         [JsonConstructor]
         public NetworkLayer(string type)
         {
             Type = type;
         }
+
+        public abstract void ComputeOutput();
+
+        public abstract LayerOutput GetData();
+
+        public abstract void CompileLayer(NetworkLayer previousLayer);
     }
+
+    
 }
