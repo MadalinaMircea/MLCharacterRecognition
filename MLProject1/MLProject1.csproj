@@ -68,6 +68,9 @@
     <Compile Include="CNN\FilteredImage.cs" />
     <Compile Include="CNN\FilteredImageChannel.cs" />
     <Compile Include="CNN\FlattenedImage.cs" />
+    <Compile Include="CNN\ImageController.cs" />
+    <Compile Include="CNN\ImageRepository.cs" />
+    <Compile Include="CNN\InputOutputPair.cs" />
     <Compile Include="CNN\Kernel.cs" />
     <Compile Include="CNN\LayerOutput.cs" />
     <Compile Include="CNN\RGBPixel.cs" />

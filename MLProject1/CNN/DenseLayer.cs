@@ -10,22 +10,24 @@ namespace MLProject1.CNN
     [Serializable]
     class DenseLayer : NetworkLayer
     {
-        public int Units { get; }
+        public int NumberOfUnits { get; }
         public Activation ActivationFunction { get; }
 
+        [JsonIgnore]
+        public Unit[] Units { get; set; }
+
+        [JsonIgnore]
         public FlattenedImage Output { get; set; }
-        public DenseLayer(int units, Activation activationFunction, FlattenedImage output = null) : base("Dense")
+        public DenseLayer(int numberOfUnits, Activation activationFunction) : base("Dense")
         {
-            Units = units;
+            NumberOfUnits = numberOfUnits;
             ActivationFunction = activationFunction;
-            Output = output;
         }
 
         [JsonConstructor]
-        public DenseLayer(int units, string activationFunction, FlattenedImage output = null) : base("Dense")
+        public DenseLayer(int numberOfUnits, string activationFunction) : base("Dense")
         {
-            Units = units;
-            Output = output;
+            NumberOfUnits = numberOfUnits;
             if (activationFunction == "relu")
             {
                 ActivationFunction = new ReluActivation();
@@ -43,15 +45,28 @@ namespace MLProject1.CNN
 
         public override void ComputeOutput()
         {
-            throw new NotImplementedException();
+            FlattenedImage previous = (FlattenedImage)PreviousLayer.GetData();
+
+            for (int i = 0; i < NumberOfUnits; i++)
+            {
+                Output.Values[i] = Units[i].ComputeOutput(previous);
+            }
+
+            Output = (FlattenedImage)ActivationFunction.Activate(Output);
         }
 
         public override void CompileLayer(NetworkLayer previousLayer)
         {
             PreviousLayer = previousLayer;
-            if (Output == null)
+            FlattenedImage previous = (FlattenedImage)PreviousLayer.GetData();
+            Output = new FlattenedImage(NumberOfUnits);
+            if(Units == null)
             {
-                Output = new FlattenedImage(Units);
+                Units = new Unit[NumberOfUnits];
+                for(int i = 0; i < NumberOfUnits; i++)
+                {
+                    Units[i] = new Unit(previous.Size);
+                }
             }
         }
     }

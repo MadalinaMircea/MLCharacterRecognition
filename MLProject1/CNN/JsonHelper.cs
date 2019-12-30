@@ -43,6 +43,8 @@ namespace MLProject1.CNN
                     return JsonConvert.DeserializeObject<FlattenLayer>(jo.ToString(), SpecifiedSubclassConversion);
                 case "Dense":
                     return JsonConvert.DeserializeObject<DenseLayer>(jo.ToString(), SpecifiedSubclassConversion);
+                case "Input":
+                    return JsonConvert.DeserializeObject<InputLayer>(jo.ToString(), SpecifiedSubclassConversion);
                 default:
                     throw new Exception();
             }

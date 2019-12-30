@@ -25,7 +25,7 @@ namespace MLProject1
         bool isMouseDown = false;
 
         //KerasNeuralNetwork network;
-        ConvolutionalNeuralNetwork network;
+        CNNController controller = new CNNController();
 
         int i = 0;
 
@@ -52,9 +52,10 @@ namespace MLProject1
             //    gch.Free();
             //}
 
-            CNNController controller = new CNNController();
-            network = controller.CreateModel();
-            network.Compile();
+            //controller.CreateAndCompileModel("tryNewJson.json", "tryWeights");
+
+            controller.PrepareImageSets("new\\Square\\Alphabet Training",
+                "new\\Square\\Alphabet Testing", "new\\Square\\Alphabet Validation");
 
             //H5FileId fileId = H5F.open("tryToRead.h5", H5F.OpenMode.ACC_RDONLY);
 
@@ -134,9 +135,9 @@ namespace MLProject1
         {
             string path = Environment.CurrentDirectory + "\\image.jpg";
 
-            ImageProcessing.CropWhite(pictureBox1.Image, path, 75, 75);
+            Bitmap img = ImageProcessing.CropWhite(pictureBox1.Image, 75, 75);
 
-            predictionLabel.Text = network.RecogniseImage(path).ToString();
+            predictionLabel.Text = controller.RecogniseImage(img).ToString();
 
 
             ClearPicture();
@@ -159,7 +160,7 @@ namespace MLProject1
                 string file = openFileDialog1.FileName;
                 try
                 {
-                    predictionLabel.Text = network.RecogniseImage(file).ToString();
+                    predictionLabel.Text = controller.RecogniseImage(new Bitmap(file)).ToString();
 
                     Bitmap bmp = new Bitmap(file);
                     pictureBox1.Image = bmp;

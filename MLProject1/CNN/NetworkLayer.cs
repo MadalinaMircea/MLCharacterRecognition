@@ -13,6 +13,7 @@ namespace MLProject1.CNN
     {
         public string Type { get; }
 
+        [JsonIgnore]
         public NetworkLayer PreviousLayer { get; set; }
 
         [JsonConstructor]

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace MLProject1.CNN
     [Serializable]
     class FlattenLayer : NetworkLayer
     {
+        [JsonIgnore]
         public FlattenedImage Output { get; set; }
         public FlattenLayer(FlattenedImage output = null) : base("Flatten")
         {
@@ -22,7 +24,20 @@ namespace MLProject1.CNN
 
         public override void ComputeOutput()
         {
-            throw new NotImplementedException();
+            FilteredImage image = (FilteredImage)PreviousLayer.GetData();
+            int outputIndex = 0;
+
+            for(int channel = 0; channel < image.NumberOfChannels; channel++)
+            {
+                for(int valuesI = 0; valuesI < image.Size; valuesI++)
+                {
+                    for(int valuesJ = 0; valuesJ < image.Size; valuesJ++)
+                    {
+                        Output.Values[outputIndex] = image.Channels[channel].Values[valuesI, valuesJ];
+                        outputIndex++;
+                    }
+                }
+            }
         }
 
         public override void CompileLayer(NetworkLayer previousLayer)
@@ -30,7 +45,8 @@ namespace MLProject1.CNN
             PreviousLayer = previousLayer;
             if(Output == null)
             {
-                Output = new FlattenedImage(previousLayer.GetData().NumberOfWeights);
+                FilteredImage previous = (FilteredImage)previousLayer.GetData();
+                Output = new FlattenedImage(previous.Size * previous.Size * previous.NumberOfChannels);
             }
         }
     }

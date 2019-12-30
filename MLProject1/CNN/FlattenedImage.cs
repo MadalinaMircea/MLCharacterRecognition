@@ -10,11 +10,16 @@ namespace MLProject1.CNN
     {
         public int Size { get; set; }
         public double[] Values { get; set; }
-        public FlattenedImage(int size, double[] values = null)
+        public FlattenedImage(int size, double[] values)
         {
             Size = size;
             Values = values;
-            NumberOfWeights = size;
+        }
+
+        public FlattenedImage(int size)
+        {
+            Size = size;
+            Values = new double[size];
         }
     }
 }

@@ -6,7 +6,5 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class Neuron : Unit
-    {
-    }
+    
 }

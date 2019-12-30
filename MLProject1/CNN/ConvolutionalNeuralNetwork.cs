@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using HDF5DotNet;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -14,27 +15,39 @@ namespace MLProject1.CNN
     {
         public InputLayer Input { get; }
         public List<NetworkLayer> NetworkLayers { get; }
-        public OutputLayer Output { get; }
         public ConvolutionalNeuralNetwork(string modelFile, string weightsFile)
         {
             ConvolutionalNeuralNetwork item = LoadJson(modelFile);
             Input = item.Input;
             NetworkLayers = item.NetworkLayers;
-            Output = item.Output;
         }
 
+        //private void LoadWeightsFile(string weightsFile)
+        //{
+        //    H5FileId fileId = H5F.open(weightsFile, H5F.OpenMode.ACC_RDONLY);
+
+        //    H5GroupId groupId = H5G.open(fileId, "/model_weights/conv2d_1/conv2d_1");
+
+        //    H5DataSetId datasetId = H5D.open(groupId, "bias:0");
+
+        //    H5DataTypeId datatypeId = H5D.getType(datasetId);
+
+        //    float[,] arr = new float[32, 1];
+        //    H5Array<float> array = new H5Array<float>(arr);
+
+        //    H5D.read<float>(datasetId, datatypeId, array);
+        //}
+
         [JsonConstructor]
-        public ConvolutionalNeuralNetwork(InputLayer input, List<NetworkLayer> networkLayers, OutputLayer output)
+        public ConvolutionalNeuralNetwork(InputLayer input, List<NetworkLayer> networkLayers)
         {
             Input = input;
             NetworkLayers = networkLayers;
-            Output = output;
         }
 
-        public ConvolutionalNeuralNetwork(int inputWidth, int inputHeight, int outputSize)
+        public ConvolutionalNeuralNetwork(int inputSize)
         {
-            Input = new InputLayer(inputWidth, inputHeight);
-            Output = new OutputLayer(outputSize);
+            Input = new InputLayer(inputSize);
             NetworkLayers = new List<NetworkLayer>();
         }
 
@@ -43,9 +56,17 @@ namespace MLProject1.CNN
             NetworkLayers.Add(layer);
         }
 
-        public void Train()
+        private void TrainModel()
         {
 
+        }
+
+        public void Train(string trainingFolder, string validationFolder)
+        {
+            foreach(string directoryPath in Directory.GetDirectories(trainingFolder))
+            {
+
+            }
         }
 
         public void Evaluate()
@@ -53,17 +74,24 @@ namespace MLProject1.CNN
 
         }
 
-        public char RecogniseImage(string path)
+        private double[] GetOutput()
         {
-            Input.SetInputImage(path);
+            FlattenedImage result = (FlattenedImage)NetworkLayers[NetworkLayers.Count - 1].GetData();
+            return result.Values;
+        }
+
+        public double[] RecogniseImage(FilteredImage image)
+        {
+            Input.SetInputImage(image);
 
             foreach(NetworkLayer layer in NetworkLayers)
             {
                 layer.ComputeOutput();
             }
 
+            //Output.ComputeOutput();
 
-            return 'A';
+            return GetOutput();
         }
 
         private ConvolutionalNeuralNetwork LoadJson(string modelJson)
@@ -82,7 +110,7 @@ namespace MLProject1.CNN
             Input.CompileLayer(null);
             if (NetworkLayers.Count == 0)
             {
-                Output.PreviousLayer = Input;
+                throw new Exception("No layers added.");
             }
             else
             {
@@ -91,7 +119,7 @@ namespace MLProject1.CNN
                 {
                     NetworkLayers[i].CompileLayer(NetworkLayers[i - 1]);
                 }
-                Output.CompileLayer(NetworkLayers[NetworkLayers.Count - 1]);
+                //Output.CompileLayer(NetworkLayers[NetworkLayers.Count - 1]);
             }
         }
 

@@ -16,5 +16,11 @@ namespace MLProject1.CNN
             Size = size;
             Values = values;
         }
+
+        public FilteredImageChannel(int size)
+        {
+            Size = size;
+            Values = new double[size, size];
+        }
     }
 }

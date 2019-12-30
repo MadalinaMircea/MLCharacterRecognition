@@ -185,7 +185,7 @@ namespace MLProject1
             return result;
         }
 
-        public static void CropWhite(Image image, string path, int width, int height)
+        public static Bitmap CropWhite(Image image, int width, int height)
         {
             //top row, bottom row, left column, right column
             List<int> limits = GetWhiteLimits(image);
@@ -216,7 +216,7 @@ namespace MLProject1
             //    resized = ResizeImage(newImage, (int)(((double)height / (double)newHeight) * image.Width), height);
             //}
 
-            SaveImage(resized, path);
+            return new Bitmap(resized);
         }
 
         public static void RemoveWhiteDataset()
@@ -236,7 +236,7 @@ namespace MLProject1
                     {
                         using (Image img = Image.FromFile(file))
                         {
-                            ImageProcessing.CropWhite(img, "new\\Square\\" + type + "\\" + c + "\\image" + i + ".jpg", 75, 75);
+                            SaveImage(ImageProcessing.CropWhite(img, 75, 75), "new\\Square\\" + type + "\\" + c + "\\image" + i + ".jpg");
                             i++;
                         }
                     }

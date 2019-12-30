@@ -8,9 +8,8 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class Filter : WeightType
+    class Filter
     {
-        //public RGBPixel[,] Filter;
         public Kernel[] Kernels { get; set; }
         public int KernelNumber { get; set; }
         public int KernelSize { get; set; }
@@ -24,13 +23,6 @@ namespace MLProject1.CNN
             InitializeRandom();
         }
 
-        public Filter(int kernelNumber, int kernelSize, Kernel[] kernels)
-        {
-            KernelNumber = kernelNumber;
-            KernelSize = kernelSize;
-            Kernels = kernels;
-        }
-
         private void InitializeRandom()
         {
             for (int i = 0; i < KernelNumber; i++)
@@ -38,41 +30,10 @@ namespace MLProject1.CNN
                 Kernels[i] = new Kernel(KernelSize);
             }
         }
-
-        //public RGBPixel[,] Convolve(RGBPixel[,] image)
-        //{
-        //    RGBPixel[,] result = new RGBPixel[image.GetLength(0), image.GetLength(1)];
-
-        //    int halfSize = KernelSize / 2;
-
-        //    for(int imageI = halfSize; imageI < image.GetLength(0) - halfSize - 1; imageI++)
-        //    {
-        //        for(int imageJ = halfSize; imageJ < image.GetLength(1) - halfSize - 1; imageJ++)
-        //        {
-        //            //Working on pixel image[imageI, imageJ]
-
-        //            double totalRed = 0, totalGreen = 0, totalBlue = 0;
-
-        //            for(int filterI = 0; filterI < KernelSize; filterI++)
-        //            {
-        //                for(int filterJ = 0; filterJ < KernelSize; filterJ++)
-        //                {
-        //                    totalRed += image[imageI + filterI, imageJ + filterJ].Red * K[filterI, filterJ];
-        //                    totalGreen += image[imageI + filterI, imageJ + filterJ].Green * Filter[filterI, filterJ];
-        //                    totalBlue += image[imageI + filterI, imageJ + filterJ].Blue * Filter[filterI, filterJ];
-        //                }
-        //            }
-
-        //            result[imageI - halfSize, imageJ - halfSize] = new RGBPixel(totalRed, totalGreen, totalBlue);
-        //        }
-        //    }
-
-        //    return result;
-        //}
-
         public FilteredImageChannel Convolve(FilteredImage input)
         {
-            double[,] values = new double[KernelSize, KernelSize];
+            int resultSize = input.Size;
+            double[,] values = new double[resultSize, resultSize];
 
             double[,] kernelOutput;
 
@@ -80,16 +41,16 @@ namespace MLProject1.CNN
             {
                 kernelOutput = Kernels[i].Convolve(input.Channels[i]);
 
-                for (int kernelI = 0; kernelI < KernelSize; kernelI++)
+                for (int outputI = 0; outputI < resultSize; outputI++)
                 {
-                    for (int kernelJ = 0; kernelJ < KernelSize; kernelJ++)
+                    for (int outputJ = 0; outputJ < resultSize; outputJ++)
                     {
-                        values[kernelI, kernelJ] += kernelOutput[kernelI, kernelJ];
+                        values[outputI, outputJ] += kernelOutput[outputI, outputJ];
                     }
                 }
             }
 
-            return new FilteredImageChannel(KernelSize, values);
+            return new FilteredImageChannel(resultSize, values);
         }
     }
 }

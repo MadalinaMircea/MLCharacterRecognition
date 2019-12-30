@@ -8,6 +8,6 @@ namespace MLProject1.CNN
 {
     class LayerOutput
     {
-        public int NumberOfWeights { get; set; }
+        //public int NumberOfWeights { get; set; }
     }
 }

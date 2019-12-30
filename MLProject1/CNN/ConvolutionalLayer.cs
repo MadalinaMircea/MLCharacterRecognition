@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,26 +12,26 @@ namespace MLProject1.CNN
     class ConvolutionalLayer : NetworkLayer
     {
         public int FilterNumber { get; }
+
+        [JsonIgnore]
         public Filter[] Filters { get; set; }
         public int FilterSize { get; }
         public Activation ActivationFunction { get; }
 
+        [JsonIgnore]
         public FilteredImage OutputImage { get; set; }
 
-        public ConvolutionalLayer(int filterNumber, int filterSize, Activation activationFunction, Filter[] filters) : base("Convolutional")
+        public ConvolutionalLayer(int filterNumber, int filterSize, Activation activationFunction) : base("Convolutional")
         {
             FilterNumber = filterNumber;
-            Filters = filters;
             FilterSize = filterSize;
             ActivationFunction = activationFunction;
-            OutputImage = new FilteredImage(filterNumber, new FilteredImageChannel[filterNumber]);
         }
 
         [JsonConstructor]
-        public ConvolutionalLayer(int filterNumber, int filterSize, string activationFunction, Filter[] filters) : base("Convolutional")
+        public ConvolutionalLayer(int filterNumber, int filterSize, string activationFunction) : base("Convolutional")
         {
             FilterNumber = filterNumber;
-            Filters = filters;
             FilterSize = filterSize;
 
             if (activationFunction == "relu")
@@ -42,18 +43,7 @@ namespace MLProject1.CNN
                 ActivationFunction = new SoftmaxActivation();
             }
 
-            OutputImage = new FilteredImage(filterNumber, new FilteredImageChannel[filterNumber]);
-        }
-
-        public ConvolutionalLayer(int filterNumber, int filterSize, Activation activationFunction) : base("Convolutional")
-        {
-            FilterNumber = filterNumber;
-            FilterSize = filterSize;
-            ActivationFunction = activationFunction;
-
             Filters = new Filter[filterNumber];
-
-            OutputImage = new FilteredImage(filterNumber, new FilteredImageChannel[filterNumber]);
         }
 
         private void CreateKernels(int kernelNumber)
@@ -76,14 +66,23 @@ namespace MLProject1.CNN
 
             for (int i = 0; i < FilterNumber; i++)
             {
-                channels[i] = Filters[i].Convolve((FilteredImage)PreviousLayer.GetData());
+                channels[i] = Filters[i].Convolve(img);
             }
+
+            OutputImage = (FilteredImage)ActivationFunction.Activate(new FilteredImage(FilterNumber, channels));
         }
 
         public override void CompileLayer(NetworkLayer previousLayer)
         {
             PreviousLayer = previousLayer;
-            CreateKernels(previousLayer.GetData().NumberOfWeights);
+            FilteredImage previous = (FilteredImage)PreviousLayer.GetData();
+
+            if (Filters[0] == null)
+            {
+                CreateKernels(previous.NumberOfChannels);
+            }
+
+            OutputImage = new FilteredImage(FilterNumber, previous.Size);
         }
     }
 }

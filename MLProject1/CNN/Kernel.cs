@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ namespace MLProject1.CNN
         public double[,] Values { get; set; }
         public int Size { get; set; }
 
+        [JsonConstructor]
         public Kernel(int size, double[,] values)
         {
             if (size % 2 == 0)

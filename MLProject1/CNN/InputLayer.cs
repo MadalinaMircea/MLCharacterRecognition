@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -10,51 +11,19 @@ namespace MLProject1.CNN
     [Serializable]
     class InputLayer : NetworkLayer
     {
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public int Size { get; set; }
 
-        //public RGBPixel[,] Image { get; set; }
-
+        [JsonIgnore]
         public FilteredImage Output { get; set; }
 
-        public InputLayer(int width, int height, FilteredImage output = null) : base("Input")
+        public InputLayer(int size) : base("Input")
         {
-            Width = width;
-            Height = height;
-            Output = output;
+            Size = size;
         }
 
-        //public InputLayer(int width, int height, RGBPixel[,] image)
-        //{
-        //    Width = width;
-        //    Height = height;
-        //    Image = image;
-        //}
-
-        public InputLayer(int width, int height, string imagePath) : base("Input")
+        public void SetInputImage(FilteredImage image)
         {
-            Width = width;
-            Height = height;
-            SetInputImage(imagePath);
-        }
-
-        public InputLayer(int width, int height, Bitmap bitmap) : base("Input")
-        {
-            Width = width;
-            Height = height;
-            SetInputImage(bitmap);
-        }
-
-        public void SetInputImage(string imagePath)
-        {
-            //Image = ImageProcessing.GetNormalizedRGBMatrix(imagePath);
-            SetInputImage(new Bitmap(imagePath));
-        }
-
-        public void SetInputImage(Bitmap bitmap)
-        {
-            //Image = ImageProcessing.GetNormalizedRGBMatrix(bitmap);
-            Output = ImageProcessing.GetNormalizedFilteredImage(bitmap);
+            Output = image;
         }
 
         public override void ComputeOutput()
@@ -71,7 +40,7 @@ namespace MLProject1.CNN
         {
             if (Output == null)
             {
-                Output = new FilteredImage(3, new FilteredImageChannel[3]);
+                Output = new FilteredImage(3, Size);
             }
         }
     }
