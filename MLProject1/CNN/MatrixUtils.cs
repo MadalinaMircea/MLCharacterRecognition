@@ -29,54 +29,50 @@ namespace MLProject1.CNN
             int resultSize = matrix.GetLength(0) - kernel.GetLength(0) + 1;
             double[,] result = new double[resultSize, resultSize];
 
-            //Task[] tasks = new Task[matrix.GetLength(0)];
-
-            //for (int outputI = 0; outputI < matrix.GetLength(0); outputI++)
-            //{
-            //    int taski = 0 + outputI;
-
-            //    tasks[taski] = Task.Run(() =>
-            //    {
-            //        for (int outputJ = 0; outputJ < matrix.GetLength(0); outputJ++)
-            //        {
-            //            double total = 0;
-            //            for (int kernelI = 0; kernelI < kernel.GetLength(0); kernelI++)
-            //            {
-            //                for (int kernelJ = 0; kernelJ < kernel.GetLength(0); kernelJ++)
-            //                {
-            //                    int indexI = taski + kernelI - halfSize;
-            //                    int indexJ = outputJ + kernelJ - halfSize;
-
-            //                    if (indexI >= 0 && indexI < matrix.GetLength(0) && indexJ >= 0 && indexJ < matrix.GetLength(0))
-            //                    {
-            //                        total += matrix[indexI, indexJ] * kernel[kernelI, kernelJ];
-            //                    }
-            //                }
-            //            }
-            //            result[taski, outputJ] = total;
-            //        }
-            //    });
-            //}
-
-            //Task.WaitAll(tasks);
+            Task[] tasks = new Task[resultSize];
 
             for (int outputI = 0; outputI < resultSize; outputI++)
             {
-                for (int outputJ = 0; outputJ < resultSize; outputJ++)
+                int taski = 0 + outputI;
+
+                tasks[taski] = Task.Run(() =>
                 {
-                    double total = 0;
-                    for (int kernelI = 0; kernelI < kernel.GetLength(0); kernelI++)
+                    for (int outputJ = 0; outputJ < resultSize ; outputJ++)
                     {
-                        for (int kernelJ = 0; kernelJ < kernel.GetLength(0); kernelJ++)
+                        double total = 0;
+                        for (int kernelI = 0; kernelI < kernel.GetLength(0); kernelI++)
                         {
-                            int indexI = outputI + kernelI;
-                            int indexJ = outputJ + kernelJ;
-                            total += matrix[indexI, indexJ] * kernel[kernelI, kernelJ];
+                            for (int kernelJ = 0; kernelJ < kernel.GetLength(0); kernelJ++)
+                            {
+                                int indexI = taski + kernelI;
+                                int indexJ = outputJ + kernelJ;
+                                total += matrix[indexI, indexJ] * kernel[kernelI, kernelJ];
+                            }
                         }
+                        result[taski, outputJ] = total;
                     }
-                    result[outputI, outputJ] = total;
-                }
+                });
             }
+
+            Task.WaitAll(tasks);
+
+            //for (int outputI = 0; outputI < resultSize; outputI++)
+            //{
+            //    for (int outputJ = 0; outputJ < resultSize; outputJ++)
+            //    {
+            //        double total = 0;
+            //        for (int kernelI = 0; kernelI < kernel.GetLength(0); kernelI++)
+            //        {
+            //            for (int kernelJ = 0; kernelJ < kernel.GetLength(0); kernelJ++)
+            //            {
+            //                int indexI = outputI + kernelI;
+            //                int indexJ = outputJ + kernelJ;
+            //                total += matrix[indexI, indexJ] * kernel[kernelI, kernelJ];
+            //            }
+            //        }
+            //        result[outputI, outputJ] = total;
+            //    }
+            //}
 
             return result;
         }
@@ -86,58 +82,58 @@ namespace MLProject1.CNN
             double[,] result = new double[matrix.GetLength(0), matrix.GetLength(0)];
             int halfSize = kernel.GetLength(0) / 2;
 
-            //Task[] tasks = new Task[matrix.GetLength(0)];
-
-            //for (int outputI = 0; outputI < matrix.GetLength(0); outputI++)
-            //{
-            //    int taski = 0 + outputI;
-
-            //    tasks[taski] = Task.Run(() =>
-            //    {
-            //        for (int outputJ = 0; outputJ < matrix.GetLength(0); outputJ++)
-            //        {
-            //            double total = 0;
-            //            for (int kernelI = 0; kernelI < kernel.GetLength(0); kernelI++)
-            //            {
-            //                for (int kernelJ = 0; kernelJ < kernel.GetLength(0); kernelJ++)
-            //                {
-            //                    int indexI = taski + kernelI - halfSize;
-            //                    int indexJ = outputJ + kernelJ - halfSize;
-
-            //                    if (indexI >= 0 && indexI < matrix.GetLength(0) && indexJ >= 0 && indexJ < matrix.GetLength(0))
-            //                    {
-            //                        total += matrix[indexI, indexJ] * kernel[kernelI, kernelJ];
-            //                    }
-            //                }
-            //            }
-            //            result[taski, outputJ] = total;
-            //        }
-            //    });
-            //}
-
-            //Task.WaitAll(tasks);
+            Task[] tasks = new Task[matrix.GetLength(0)];
 
             for (int outputI = 0; outputI < matrix.GetLength(0); outputI++)
             {
-                for (int outputJ = 0; outputJ < matrix.GetLength(0); outputJ++)
-                {
-                    double total = 0;
-                    for (int kernelI = 0; kernelI < kernel.GetLength(0); kernelI++)
-                    {
-                        for (int kernelJ = 0; kernelJ < kernel.GetLength(0); kernelJ++)
-                        {
-                            int indexI = outputI + kernelI - halfSize;
-                            int indexJ = outputJ + kernelJ - halfSize;
+                int taski = 0 + outputI;
 
-                            if (indexI >= 0 && indexI < matrix.GetLength(0) && indexJ >= 0 && indexJ < matrix.GetLength(0))
+                tasks[taski] = Task.Run(() =>
+                {
+                    for (int outputJ = 0; outputJ < matrix.GetLength(0); outputJ++)
+                    {
+                        double total = 0;
+                        for (int kernelI = 0; kernelI < kernel.GetLength(0); kernelI++)
+                        {
+                            for (int kernelJ = 0; kernelJ < kernel.GetLength(0); kernelJ++)
                             {
-                                total += matrix[indexI, indexJ] * kernel[kernelI, kernelJ];
+                                int indexI = taski + kernelI - halfSize;
+                                int indexJ = outputJ + kernelJ - halfSize;
+
+                                if (indexI >= 0 && indexI < matrix.GetLength(0) && indexJ >= 0 && indexJ < matrix.GetLength(0))
+                                {
+                                    total += matrix[indexI, indexJ] * kernel[kernelI, kernelJ];
+                                }
                             }
                         }
+                        result[taski, outputJ] = total;
                     }
-                    result[outputI, outputJ] = total;
-                }
+                });
             }
+
+            Task.WaitAll(tasks);
+
+            //for (int outputI = 0; outputI < matrix.GetLength(0); outputI++)
+            //{
+            //    for (int outputJ = 0; outputJ < matrix.GetLength(0); outputJ++)
+            //    {
+            //        double total = 0;
+            //        for (int kernelI = 0; kernelI < kernel.GetLength(0); kernelI++)
+            //        {
+            //            for (int kernelJ = 0; kernelJ < kernel.GetLength(0); kernelJ++)
+            //            {
+            //                int indexI = outputI + kernelI - halfSize;
+            //                int indexJ = outputJ + kernelJ - halfSize;
+
+            //                if (indexI >= 0 && indexI < matrix.GetLength(0) && indexJ >= 0 && indexJ < matrix.GetLength(0))
+            //                {
+            //                    total += matrix[indexI, indexJ] * kernel[kernelI, kernelJ];
+            //                }
+            //            }
+            //        }
+            //        result[outputI, outputJ] = total;
+            //    }
+            //}
 
             return result;
         }

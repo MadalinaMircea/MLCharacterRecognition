@@ -126,28 +126,30 @@ namespace MLProject1.CNN
             FilteredImage nextErrors = (FilteredImage)nextOutput[0];
             FilteredImage activationDerivatives = (FilteredImage)ActivationFunction.GetDerivative(nextErrors);
 
-            //Task[] tasks = new Task[FilterNumber];
-
-            //for (int i = 0; i < FilterNumber; i++)
-            //{
-            //    int taski = 0 + i;
-
-            //    tasks[taski] = Task.Run(() =>
-            //    {
-            //        newErrors[taski] = Filters[taski].Backpropagate(previous,
-            //        activationDerivatives.Channels[taski], learningRate);
-            //    });
-            //}
-
-            //Task.WaitAll(tasks);
-
             bool samePadding = (Padding == "same") ? true : false;
+
+            Task[] tasks = new Task[FilterNumber];
 
             for (int i = 0; i < FilterNumber; i++)
             {
-                newErrors[i] = Filters[i].Backpropagate(previous,
-                    activationDerivatives.Channels[i], learningRate, samePadding);
+                int taski = 0 + i;
+
+                tasks[taski] = Task.Run(() =>
+                {
+                    newErrors[taski] = Filters[taski].Backpropagate(previous,
+                    activationDerivatives.Channels[taski], learningRate, samePadding);
+                });
             }
+
+            Task.WaitAll(tasks);
+
+            
+
+            //for (int i = 0; i < FilterNumber; i++)
+            //{
+            //    newErrors[i] = Filters[i].Backpropagate(previous,
+            //        activationDerivatives.Channels[i], learningRate, samePadding);
+            //}
 
             return newErrors;
         }

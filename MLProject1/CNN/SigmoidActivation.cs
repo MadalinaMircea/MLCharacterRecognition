@@ -16,6 +16,10 @@ namespace MLProject1.CNN
             {
                 return ActivateFlattenedImage((FlattenedImage)output);
             }
+            if (output is FilteredImage)
+            {
+                return ActivateFilteredImage((FilteredImage)output);
+            }
 
             return null;
         }
@@ -29,6 +33,23 @@ namespace MLProject1.CNN
 
             return output;
         }
+
+        private LayerOutput ActivateFilteredImage(FilteredImage img)
+        {
+            foreach (FilteredImageChannel channel in img.Channels)
+            {
+                for (int i = 0; i < channel.Size; i++)
+                {
+                    for (int j = 0; j < channel.Size; j++)
+                    {
+                        channel.Values[i, j] = ActivateValue(channel.Values[i, j]);
+                    }
+                }
+            }
+
+            return img;
+        }
+
 
         private double ActivateValue(double v)
         {

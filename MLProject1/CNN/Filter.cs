@@ -62,42 +62,42 @@ namespace MLProject1.CNN
 
             double[,] kernelOutput;
 
-            //Task[] tasks = new Task[KernelNumber];
-
-            //for (int i = 0; i < input.NumberOfChannels; i++)
-            //{
-            //    int taski = 0 + i;
-
-            //    tasks[taski] = Task.Run(() =>
-            //    {
-            //        kernelOutput = Kernels[taski].Convolve(input.Channels[taski]);
-
-            //        for (int outputI = 0; outputI < resultSize; outputI++)
-            //        {
-            //            for (int outputJ = 0; outputJ < resultSize; outputJ++)
-            //            {
-            //                Monitor.Enter(values);
-            //                values[outputI, outputJ] += kernelOutput[outputI, outputJ];
-            //                Monitor.Exit(values);
-            //            }
-            //        }
-            //    });
-            //}
-
-            //Task.WaitAll(tasks);
+            Task[] tasks = new Task[KernelNumber];
 
             for (int i = 0; i < input.NumberOfChannels; i++)
             {
-                kernelOutput = Kernels[i].Convolve(input.Channels[i], samePadding);
+                int taski = 0 + i;
 
-                for (int outputI = 0; outputI < resultSize; outputI++)
+                tasks[taski] = Task.Run(() =>
                 {
-                    for (int outputJ = 0; outputJ < resultSize; outputJ++)
+                    kernelOutput = Kernels[taski].Convolve(input.Channels[taski], samePadding);
+
+                    for (int outputI = 0; outputI < resultSize; outputI++)
                     {
-                        values[outputI, outputJ] += kernelOutput[outputI, outputJ];
+                        for (int outputJ = 0; outputJ < resultSize; outputJ++)
+                        {
+                            Monitor.Enter(values);
+                            values[outputI, outputJ] += kernelOutput[outputI, outputJ];
+                            Monitor.Exit(values);
+                        }
                     }
-                }
+                });
             }
+
+            Task.WaitAll(tasks);
+
+            //for (int i = 0; i < input.NumberOfChannels; i++)
+            //{
+            //    kernelOutput = Kernels[i].Convolve(input.Channels[i], samePadding);
+
+            //    for (int outputI = 0; outputI < resultSize; outputI++)
+            //    {
+            //        for (int outputJ = 0; outputJ < resultSize; outputJ++)
+            //        {
+            //            values[outputI, outputJ] += kernelOutput[outputI, outputJ];
+            //        }
+            //    }
+            //}
 
             for (int outputI = 0; outputI < resultSize; outputI++)
             {

@@ -40,6 +40,33 @@ namespace MLProject1.CNN
             Console.WriteLine("Model compiled");
         }
 
+        public void CreateAndCompileModel5()
+        {
+            Console.WriteLine("Creating model");
+            GlobalRandom.InitializeRandom();
+
+            int imgSize = 75;
+
+            SoftmaxActivation softmaxActivation = new SoftmaxActivation();
+            SigmoidActivation sigmoidActivation = new SigmoidActivation();
+
+            model = new ConvolutionalNeuralNetwork(imgSize, "grayscale");
+            model.Add(new ConvolutionalLayer(5, 3, sigmoidActivation, "valid"));
+            model.Add(new MaxPoolingLayer());
+            model.Add(new ConvolutionalLayer(5, 3, sigmoidActivation, "valid"));
+            model.Add(new MaxPoolingLayer());
+            model.Add(new DropoutLayer(0.2));
+            model.Add(new FlattenLayer());
+            model.Add(new DropoutLayer(0.2));
+            model.Add(new DenseLayer(26, softmaxActivation));
+
+            Console.WriteLine("Model created");
+
+            model.Compile();
+
+            Console.WriteLine("Model compiled");
+        }
+
         public char RecogniseImage(Bitmap img)
         {
             double[] resultProbs = model.RecogniseImage(ImageProcessing.GetNormalizedGrayscaleFilteredImage(img));
@@ -72,7 +99,7 @@ namespace MLProject1.CNN
             Console.WriteLine("Process " + process + " Testing Accuracy: " + metrics.Accuracy + ", Testing Error: " + metrics.Error);
         }
 
-        public void Train(int batchSize, string weightDirectory, int process)
+        public void Train(int batchSize, string weightDirectory, int process, double learningRate)
         {
             int batchNumber = Repo.TrainingSetPaths.Count / batchSize;
 
@@ -87,7 +114,7 @@ namespace MLProject1.CNN
                     int startPos = batch * batchSize;
 
                     Console.WriteLine("Process " + process + " Training batch: " + batch);
-                    model.Train(Repo.TrainingSetPaths.Skip(startPos).Take(batchSize).ToList(), 0.01);
+                    model.Train(Repo.TrainingSetPaths.Skip(startPos).Take(batchSize).ToList(), learningRate);
                     EvaluationMetrics metrics = Evaluate(Repo.ValidationSetPaths);
                     if (metrics.Accuracy > accuracy)
                     {

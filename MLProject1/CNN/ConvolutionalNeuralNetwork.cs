@@ -69,6 +69,28 @@ namespace MLProject1.CNN
             return 1.0 / 2.0 * (x - y) * (x - y);
         }
 
+        private FlattenedImage[] GetCrossentropyLoss(double[] output, char c)
+        {
+            FlattenedImage[] result = new FlattenedImage[output.Length];
+
+            int cInt = (int)(c - 65);
+
+            for (int i = 0; i < output.Length; i++)
+            {
+                if(i == cInt)
+                {
+                    double log = -Math.Log(output[i]);
+                    result[i] = new FlattenedImage(1, new double[1] { log });
+                }
+                else
+                {
+                    result[i] = new FlattenedImage(1, new double[1] { 0 });
+                }
+            }
+
+            return result;
+        }
+
         private FlattenedImage[] GetErrorArray(double[] actualOutput, double[] expectedOutput)
         {
             FlattenedImage[] result = new FlattenedImage[actualOutput.Length];
@@ -83,9 +105,9 @@ namespace MLProject1.CNN
 
             return result;
         }
-        public void Backpropagate(double[] actualOutput, double[] expectedOutput, double learningRate)
+        public void Backpropagate(double[] actualOutput, char outputChar, double learningRate)
         {
-            FlattenedImage[] error = GetErrorArray(actualOutput, expectedOutput);
+            FlattenedImage[] error = GetCrossentropyLoss(actualOutput, outputChar);
 
             LayerOutput[] nextError = NetworkLayers[NetworkLayers.Count - 1].Backpropagate(error, learningRate);
 
@@ -109,7 +131,13 @@ namespace MLProject1.CNN
                     input = ImageProcessing.GetNormalizedGrayscaleFilteredImage(new Bitmap(trainingSet[image].Input));
                 }
                 double[] actualOutput = RecogniseImage(input);
-                Backpropagate(actualOutput, trainingSet[image].Output, learningRate);
+
+                Backpropagate(actualOutput, trainingSet[image].OutputChar, learningRate);
+
+                if(Math.Abs(((ConvolutionalLayer)NetworkLayers[0]).Filters[0].Kernels[0].ElementSum) > 1000)
+                {
+                    throw new Exception("Weights over 1000");
+                }
             }
         }
 

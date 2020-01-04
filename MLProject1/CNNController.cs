@@ -192,8 +192,8 @@ namespace MLProject1
         public EvaluationMetrics Evaluate(List<InputOutputPair> set)
         {
             Console.WriteLine("Evaluating");
-            return model.Evaluate(set);
-            //return model.EvaluateParallel(set);
+            //return model.Evaluate(set);
+            return model.EvaluateParallel(set);
         }
 
         public void Test(int process)
@@ -203,7 +203,7 @@ namespace MLProject1
             Console.WriteLine("Process " + process + " Testing Accuracy: " + metrics.Accuracy + ", Testing Error: " + metrics.Error);
         }
 
-        public void Train(int batchSize, string weightDirectory, int process)
+        public void Train(int batchSize, string weightDirectory, int process, double learningRate)
         {
             int batchNumber = Repo.TrainingSetPaths.Count / batchSize;
 
@@ -218,7 +218,7 @@ namespace MLProject1
                     int startPos = batch * batchSize;
 
                     Console.WriteLine("Process " + process + " Training batch: " + batch);
-                    model.Train(Repo.TrainingSetPaths.Skip(startPos).Take(batchSize).ToList(), 0.01);
+                    model.Train(Repo.TrainingSetPaths.Skip(startPos).Take(batchSize).ToList(), learningRate);
                     EvaluationMetrics metrics = Evaluate(Repo.ValidationSetPaths);
                     if (metrics.Accuracy > accuracy)
                     {

@@ -42,18 +42,39 @@ namespace MLProject1.CNN
 
         public override LayerOutput GetDerivative(LayerOutput output)
         {
+            //FlattenedImage image = (FlattenedImage)output;
+
+            //double[] result = new double[image.Size];
+
+            //double totalSum = 0;
+
+            //for(int i = 0; i < image.Size; i++)
+            //{
+            //    totalSum += Math.Exp(image.Values[i]);
+            //}
+
+            //for(int i = 0; i < image.Size; i++)
+            //{
+            //    double e = Math.Exp(image.Values[i]);
+            //    result[i] = (e * (totalSum - e)) / (totalSum * totalSum);
+            //}
+
+            //return new FlattenedImage(image.Size, result);
+
             FlattenedImage image = (FlattenedImage)output;
 
             double[] result = new double[image.Size];
 
             double totalSum = 0;
 
-            for(int i = 0; i < image.Size; i++)
+            int correctClass = -1;
+
+            for (int i = 0; i < image.Size; i++)
             {
                 totalSum += Math.Exp(image.Values[i]);
             }
 
-            for(int i = 0; i < image.Size; i++)
+            for (int i = 0; i < image.Size; i++)
             {
                 double e = Math.Exp(image.Values[i]);
                 result[i] = (e * (totalSum - e)) / (totalSum * totalSum);
