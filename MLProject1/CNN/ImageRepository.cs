@@ -8,8 +8,8 @@ namespace MLProject1.CNN
 {
     class ImageRepository
     {
-        public List<InputOutputPair> TrainingSet { get; set; }
-        public List<InputOutputPair> TestingSet { get; set; }
-        public List<InputOutputPair> ValidationSet { get; set; }
+        public List<InputOutputPair> TrainingSetPaths { get; set; }
+        public List<InputOutputPair> TestingSetPaths { get; set; }
+        public List<InputOutputPair> ValidationSetPaths { get; set; }
     }
 }

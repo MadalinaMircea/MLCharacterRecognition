@@ -362,16 +362,20 @@ namespace MLProject1
                 double[,] redChannel = new double[height, height];
                 double[,] greenChannel = new double[height, height];
                 double[,] blueChannel = new double[height, height];
-                
+
 
                 for (int i = 0; i < bitmap.Height; i++)
                 {
                     for (int j = 0; j < bitmap.Height; j++)
                     {
                         Color color = bitmap.GetPixel(j, i);
-                        redChannel[i, j] = color.R / 255.0;
-                        greenChannel[i, j] = color.G / 255.0;
-                        blueChannel[i, j] = color.B / 255.0;
+                        //redChannel[i, j] = color.R / 255.0;
+                        //greenChannel[i, j] = color.G / 255.0;
+                        //blueChannel[i, j] = color.B / 255.0;
+
+                        redChannel[i, j] = (255 - color.R) / 255.0;
+                        greenChannel[i, j] = (255 - color.G) / 255.0;
+                        blueChannel[i, j] = (255 - color.B) / 255.0;
                     }
                 }
 
@@ -381,6 +385,39 @@ namespace MLProject1
 
 
                 FilteredImage image = new FilteredImage(3, channels);
+
+                return image;
+            }
+        }
+
+        public static FilteredImage GetNormalizedGrayscaleFilteredImage(Bitmap bitmap)
+        {
+            using (Bitmap bmp = new Bitmap(bitmap))
+            {
+                int height = bitmap.Height;
+
+                FilteredImageChannel[] channels = new FilteredImageChannel[1];
+
+                double[,] channel = new double[height, height];
+
+
+                for (int i = 0; i < bitmap.Height; i++)
+                {
+                    for (int j = 0; j < bitmap.Height; j++)
+                    {
+                        Color color = bitmap.GetPixel(j, i);
+                        //redChannel[i, j] = color.R / 255.0;
+                        //greenChannel[i, j] = color.G / 255.0;
+                        //blueChannel[i, j] = color.B / 255.0;
+
+                        channel[i, j] = ((color.R + color.G + color.B) / 3) / 255.0;
+                    }
+                }
+
+                channels[0] = new FilteredImageChannel(height, channel);
+
+
+                FilteredImage image = new FilteredImage(1, channels);
 
                 return image;
             }

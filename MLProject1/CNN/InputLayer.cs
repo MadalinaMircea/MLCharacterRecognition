@@ -14,11 +14,16 @@ namespace MLProject1.CNN
         public int Size { get; set; }
 
         [JsonIgnore]
-        public FilteredImage Output { get; set; }
+        public LayerOutput Output { get; set; }
 
-        public InputLayer(int size) : base("Input")
+        [JsonIgnore]
+        public string ColorScheme { get; set; }
+
+        public InputLayer(int size, string colorScheme) : base("Input")
         {
             Size = size;
+
+            ColorScheme = colorScheme;
         }
 
         public void SetInputImage(FilteredImage image)
@@ -40,8 +45,20 @@ namespace MLProject1.CNN
         {
             if (Output == null)
             {
-                Output = new FilteredImage(3, Size);
+                if (ColorScheme == "rgb")
+                {
+                    Output = new FilteredImage(3, Size);
+                }
+                else
+                {
+                    Output = new FilteredImage(1, Size);
+                }
             }
+        }
+
+        public override LayerOutput[] Backpropagate(LayerOutput[] nextOutput, double learningRate)
+        {
+            throw new NotImplementedException();
         }
     }
 }

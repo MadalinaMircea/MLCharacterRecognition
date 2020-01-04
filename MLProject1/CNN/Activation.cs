@@ -9,5 +9,7 @@ namespace MLProject1.CNN
     abstract class Activation
     {
         public abstract LayerOutput Activate(LayerOutput output);
+
+        public abstract LayerOutput GetDerivative(LayerOutput output);
     }
 }

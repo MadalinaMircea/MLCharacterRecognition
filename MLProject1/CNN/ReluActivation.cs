@@ -20,6 +20,7 @@ namespace MLProject1.CNN
             if (value < 0)
                 return 0;
             else
+                //return (value > 1) ? 1 : value;
                 return value;
         }
         private LayerOutput ActivateFlattenedImage(FlattenedImage img)
@@ -60,6 +61,50 @@ namespace MLProject1.CNN
             }
 
             return null;
+        }
+
+        public override LayerOutput GetDerivative(LayerOutput output)
+        {
+            if (output is FilteredImage)
+            {
+                return GetFilteredDerivative((FilteredImage)output);
+            }
+            if (output is FlattenedImage)
+            {
+                return GetFlattenedDerivative((FlattenedImage)output);
+            }
+            return null;
+        }
+
+        private LayerOutput GetFlattenedDerivative(FlattenedImage output)
+        {
+            for (int i = 0; i < output.Size; i++)
+            {
+                output.Values[i] = GetValueDerivative(output.Values[i]);
+            }
+
+            return output;
+        }
+
+        private LayerOutput GetFilteredDerivative(FilteredImage output)
+        {
+            for (int c = 0; c < output.NumberOfChannels; c++)
+            {
+                for (int i = 0; i < output.Size; i++)
+                {
+                    for (int j = 0; j < output.Size; j++)
+                    {
+                        output.Channels[c].Values[i, j] = GetValueDerivative(output.Channels[c].Values[i, j]);
+                    }
+                }
+            }
+
+            return output;
+        }
+
+        private double GetValueDerivative(double v)
+        {
+            return (v <= 0) ? 0 : 1;
         }
     }
 }

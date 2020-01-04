@@ -31,8 +31,6 @@ namespace MLProject1.CNN
 
         private void ComputeFilteredImage()
         {
-            Random rnd = new Random();
-
             FilteredImage image = (FilteredImage)PreviousLayer.GetData();
             FilteredImageChannel[] newChannels = new FilteredImageChannel[image.NumberOfChannels];
             int size = image.Size;
@@ -45,7 +43,7 @@ namespace MLProject1.CNN
                 {
                     for (int valuesJ = 0; valuesJ < size; valuesJ++)
                     {
-                        if (rnd.NextDouble() < Rate)
+                        if (GlobalRandom.GetRandomDouble() < Rate)
                         {
                             newValues[valuesI, valuesJ] = 0;
                         }
@@ -64,15 +62,13 @@ namespace MLProject1.CNN
 
         private void ComputeFlattenedImage()
         {
-            Random rnd = new Random();
-
             FlattenedImage previous = (FlattenedImage)PreviousLayer.GetData();
 
             double[] newValues = new double[previous.Size];
 
             for (int i = 0; i < previous.Size; i++)
             {
-                if (rnd.NextDouble() < Rate)
+                if (GlobalRandom.GetRandomDouble() < Rate)
                 {
                     newValues[i] = 0;
                 }
@@ -122,6 +118,11 @@ namespace MLProject1.CNN
             PreviousLayer = previousLayer;
 
             InitializeOutput();
+        }
+
+        public override LayerOutput[] Backpropagate(LayerOutput[] nextOutput, double learningRate)
+        {
+            return nextOutput;
         }
     }
 }

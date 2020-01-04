@@ -13,6 +13,9 @@ namespace MLProject1.CNN
         public double[,] Values { get; set; }
         public int Size { get; set; }
 
+        [JsonIgnore]
+        public double ElementSum { get; set; }
+
         [JsonConstructor]
         public Kernel(int size, double[,] values)
         {
@@ -20,6 +23,13 @@ namespace MLProject1.CNN
                 throw new Exception("Filter cannot have even size.");
             Size = size;
             Values = values;
+
+            ComputeElementSum();
+        }
+
+        private void ComputeElementSum()
+        {
+            ElementSum = MatrixUtils.ElementSum(Values);
         }
 
         public Kernel(int size)
@@ -28,50 +38,91 @@ namespace MLProject1.CNN
                 throw new Exception("Filter cannot have even size.");
             Size = size;
             InitializeRandom();
+            ComputeElementSum();
         }
 
         private void InitializeRandom()
         {
             Values = new double[Size, Size];
             
-            Random rnd = new Random();
-
             for (int i = 0; i < Size; i++)
             {
                 for (int j = 0; j < Size; j++)
                 {
-                    Values[i, j] = rnd.NextDouble();
+                    Values[i, j] = GlobalRandom.GetRandomWeight();
                 }
             }
         }
 
-        public double[,] Convolve(FilteredImageChannel input)
+        public double[,] Convolve(FilteredImageChannel input, bool samePadding)
         {
-            double[,] result = new double[input.Size, input.Size];
-            int halfSize = Size / 2;
+            //double[,] flippedKernel = MatrixUtils.Rotate180(Values);
 
-            for(int outputI = 0; outputI < input.Size; outputI++)
+            //int fullSize = Size * Size;
+
+            if(samePadding)
             {
-                for(int outputJ = 0; outputJ < input.Size; outputJ++)
-                {
-                    double total = 0;
-                    for(int kernelI = 0; kernelI < Size; kernelI++)
-                    {
-                        for(int kernelJ = 0; kernelJ < Size; kernelJ++)
-                        {
-                            int indexI = outputI + kernelI - halfSize;
-                            int indexJ = outputJ + kernelJ - halfSize;
+                return MatrixUtils.ConvolveSame(input.Values, Values);
+            }
+            
+            return MatrixUtils.Convolve(input.Values, Values);
 
-                            if(indexI >= 0 && indexI < Size && indexJ >= 0 && indexJ < Size)
-                            {
-                                total += input.Values[indexI, indexJ] * Values[kernelI, kernelJ];
-                            }
-                        }
-                    }
-                    result[outputI, outputJ] = total;
+            //for (int i = 0; i < Size; i++)
+            //{
+            //    for (int j = 0; j < Size; j++)
+            //    {
+            //        convResult[i, j] /= fullSize;
+            //    }
+            //}
+
+        }
+
+        public FilteredImageChannel Backpropagate(FilteredImageChannel previous, FilteredImageChannel nextErrors, int totalKernels, double learningRate, bool samePadding)
+        {
+            double[,] kernelDerivatives = new double[1,1];
+
+            Task t = Task.Run(() =>
+            {
+                if (samePadding)
+                {
+                    kernelDerivatives = MatrixUtils.ConvolveSame(previous.Values, nextErrors.Values);
+                }
+                else
+                {
+                    kernelDerivatives = MatrixUtils.Convolve(previous.Values, nextErrors.Values);
+                }
+            });
+
+            double[,] flippedKernel = MatrixUtils.Rotate180(Values);
+
+            //double[,] newErrors = MatrixUtils.Convolve(flippedKernel, nextErrors.Values);
+
+            double[,] newErrors;
+
+            if (samePadding)
+            {
+                newErrors = MatrixUtils.FullConvolutionSame(flippedKernel, nextErrors.Values);
+            }
+            else
+            {
+                newErrors = MatrixUtils.FullConvolution(flippedKernel, nextErrors.Values);
+            }
+
+            
+
+            t.Wait();
+
+            for (int i = 0; i < Size; i++)
+            {
+                for(int j = 0; j < Size; j++)
+                {
+                    Values[i, j] -= learningRate * kernelDerivatives[i, j];
                 }
             }
-            return result;
+
+            ComputeElementSum();
+
+            return new FilteredImageChannel(Size, newErrors);
         }
     }
 }

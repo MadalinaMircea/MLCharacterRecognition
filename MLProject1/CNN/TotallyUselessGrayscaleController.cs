@@ -1,6 +1,4 @@
-﻿using HDF5DotNet;
-using MLProject1.CNN;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,97 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MLProject1
+namespace MLProject1.CNN
 {
-    class CNNController
+    class TotallyUselessGrayscaleController
     {
         ConvolutionalNeuralNetwork model;
         ImageRepository Repo;
-        public void CreateAndCompileModel()
-        {
-            Console.WriteLine("Creating model");
-            GlobalRandom.InitializeRandom();
-
-            int imgSize = 75;
-
-            ReluActivation reluActivation = new ReluActivation();
-            SoftmaxActivation softmaxActivation = new SoftmaxActivation();
-            SigmoidActivation sigmoidActivation = new SigmoidActivation();
-
-            model = new ConvolutionalNeuralNetwork(imgSize);
-            model.Add(new ConvolutionalLayer(32, 5, reluActivation, "same"));
-            model.Add(new MaxPoolingLayer());
-            model.Add(new ConvolutionalLayer(64, 3, reluActivation, "same"));
-            model.Add(new MaxPoolingLayer());
-            model.Add(new DropoutLayer(0.2));
-            model.Add(new ConvolutionalLayer(128, 3, reluActivation, "same"));
-            model.Add(new FlattenLayer());
-            model.Add(new DenseLayer(512, sigmoidActivation));
-            model.Add(new DropoutLayer(0.5));
-            model.Add(new DenseLayer(26, softmaxActivation));
-
-            Console.WriteLine("Model created");
-
-            model.Compile();
-
-            Console.WriteLine("Model compiled");
-        }
-
-        public void CreateAndCompileModel2()
-        {
-            Console.WriteLine("Creating model");
-            GlobalRandom.InitializeRandom();
-
-            int imgSize = 75;
-
-            ReluActivation reluActivation = new ReluActivation();
-            SoftmaxActivation softmaxActivation = new SoftmaxActivation();
-            SigmoidActivation sigmoidActivation = new SigmoidActivation();
-
-            model = new ConvolutionalNeuralNetwork(imgSize);
-            model.Add(new ConvolutionalLayer(5, 5, reluActivation, "valid"));
-            model.Add(new MaxPoolingLayer());
-            model.Add(new ConvolutionalLayer(5, 3, reluActivation, "valid"));
-            model.Add(new MaxPoolingLayer());
-            model.Add(new DropoutLayer(0.2));
-            model.Add(new FlattenLayer());
-            model.Add(new DropoutLayer(0.5));
-            model.Add(new DenseLayer(26, softmaxActivation));
-
-            Console.WriteLine("Model created");
-
-            model.Compile();
-
-            Console.WriteLine("Model compiled");
-        }
-
-        public void CreateAndCompileModel3()
-        {
-            Console.WriteLine("Creating model");
-            GlobalRandom.InitializeRandom();
-
-            int imgSize = 75;
-
-            ReluActivation reluActivation = new ReluActivation();
-            SoftmaxActivation softmaxActivation = new SoftmaxActivation();
-
-            model = new ConvolutionalNeuralNetwork(imgSize);
-            model.Add(new ConvolutionalLayer(5, 5, reluActivation, "same"));
-            model.Add(new MaxPoolingLayer());
-            model.Add(new ConvolutionalLayer(5, 3, reluActivation, "same"));
-            model.Add(new MaxPoolingLayer());
-            model.Add(new DropoutLayer(0.2));
-            model.Add(new FlattenLayer());
-            model.Add(new DropoutLayer(0.5));
-            model.Add(new DenseLayer(26, softmaxActivation));
-
-            Console.WriteLine("Model created");
-
-            model.Compile();
-
-            Console.WriteLine("Model compiled");
-        }
-
         public void CreateAndCompileModel4()
         {
             Console.WriteLine("Creating model");
@@ -110,14 +23,14 @@ namespace MLProject1
             ReluActivation reluActivation = new ReluActivation();
             SoftmaxActivation softmaxActivation = new SoftmaxActivation();
 
-            model = new ConvolutionalNeuralNetwork(imgSize);
-            model.Add(new ConvolutionalLayer(5, 5, reluActivation, "same"));
+            model = new ConvolutionalNeuralNetwork(imgSize, "grayscale");
+            model.Add(new ConvolutionalLayer(5, 3, reluActivation, "valid"));
             model.Add(new MaxPoolingLayer());
-            model.Add(new ConvolutionalLayer(5, 3, reluActivation, "same"));
+            model.Add(new ConvolutionalLayer(5, 3, reluActivation, "valid"));
             model.Add(new MaxPoolingLayer());
             model.Add(new DropoutLayer(0.2));
             model.Add(new FlattenLayer());
-            model.Add(new DropoutLayer(0.5));
+            model.Add(new DropoutLayer(0.2));
             model.Add(new DenseLayer(26, softmaxActivation));
 
             Console.WriteLine("Model created");
@@ -127,53 +40,9 @@ namespace MLProject1
             Console.WriteLine("Model compiled");
         }
 
-
-        //public void CreateSimpleModel()
-        //{
-        //    GlobalRandom.InitializeRandom();
-
-        //    SigmoidActivation sigmoidActivation = new SigmoidActivation();
-
-        //    model = new ConvolutionalNeuralNetwork(1);
-        //    model.Add(new DenseLayer(2, sigmoidActivation));
-        //    model.Add(new DenseLayer(2, sigmoidActivation));
-
-        //    model.Compile();
-
-        //    string json = JsonConvert.SerializeObject(model, Formatting.Indented);
-        //    File.WriteAllText("simpleJson.json", json);
-        //    WriteWeightsToDirectory("simpleWeights");
-        //}
-
-        //public void TrainSimple()
-        //{
-        //    FlattenedImage img = new FlattenedImage(2, new double[2] { 0.05, 0.1 });
-
-        //    double[] actualOutput = model.RecogniseImage(img);
-        //    model.Backpropagate(actualOutput, new double[2] { 0.01, 0.99 }, 0.5);
-        //}
-
-        public void CreateAndCompileModel(string jsonPath, string weightsDirectory)
-        {
-            Console.WriteLine("Creating model");
-            GlobalRandom.InitializeRandom();
-
-            model = new ConvolutionalNeuralNetwork(jsonPath, "");
-
-            Console.WriteLine("Model created");
-
-            model.Compile();
-
-            Console.WriteLine("Model compiled");
-            Console.WriteLine("Reading weights");
-            //ReadWeightsFromDirectory(weightsDirectory);
-
-            ReadWeightsFromDirectory(weightsDirectory);
-        }
-
         public char RecogniseImage(Bitmap img)
         {
-            double[] resultProbs = model.RecogniseImage(ImageProcessing.GetNormalizedFilteredImage(img));
+            double[] resultProbs = model.RecogniseImage(ImageProcessing.GetNormalizedGrayscaleFilteredImage(img));
             int maxi = -1;
             double maxx = -1;
 
@@ -232,7 +101,7 @@ namespace MLProject1
                         Console.WriteLine("Process " + process + " Accuracy over 90% achieved!");
 
                         metrics = Evaluate(Repo.TestingSetPaths);
-                        if(metrics.Accuracy >= 0.90)
+                        if (metrics.Accuracy >= 0.90)
                         {
                             Console.WriteLine("Process " + process + " Testing accuracy over 90% achieved!");
                             keepGoing = false;
@@ -268,7 +137,7 @@ namespace MLProject1
         {
             Task[] tasks = new Task[model.NetworkLayers.Count];
 
-            for(int i = 0; i < model.NetworkLayers.Count; i++)
+            for (int i = 0; i < model.NetworkLayers.Count; i++)
             {
                 int taski = 0 + i;
 
@@ -428,7 +297,7 @@ namespace MLProject1
 
         //    //Task.WaitAll(tasks);
 
-            
+
         //}
 
         public void PrepareImageSets(string trainingPath, string testingPath, string validationPath)

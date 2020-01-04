@@ -27,6 +27,8 @@ namespace MLProject1.CNN
         public abstract LayerOutput GetData();
 
         public abstract void CompileLayer(NetworkLayer previousLayer);
+
+        public abstract LayerOutput[] Backpropagate(LayerOutput[] nextOutput, double learningRate);
     }
 
     

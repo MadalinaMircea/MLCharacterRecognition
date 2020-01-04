@@ -39,17 +39,8 @@
     <Reference Include="HDF5DotNet, Version=1.8.9.0, Culture=neutral, PublicKeyToken=a4952c8df86d6e8c, processorArchitecture=AMD64">
       <HintPath>..\packages\HDF5DotNet.x64.1.8.9\lib\Net40\HDF5DotNet.dll</HintPath>
     </Reference>
-    <Reference Include="Keras, Version=3.6.1.12, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Keras.NET.3.6.1.12\lib\netstandard2.0\Keras.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Numpy.Bare, Version=3.7.1.4, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Numpy.Bare.3.6.1.9\lib\netstandard2.0\Numpy.Bare.dll</HintPath>
-    </Reference>
-    <Reference Include="Python.Runtime, Version=3.6.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Python.Runtime.NETStandard.3.6.1\lib\netstandard2.0\Python.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -65,15 +56,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CNNController.cs" />
+    <Compile Include="CNN\EvaluationMetrics.cs" />
     <Compile Include="CNN\FilteredImage.cs" />
     <Compile Include="CNN\FilteredImageChannel.cs" />
     <Compile Include="CNN\FlattenedImage.cs" />
+    <Compile Include="CNN\GlobalRandom.cs" />
     <Compile Include="CNN\ImageController.cs" />
     <Compile Include="CNN\ImageRepository.cs" />
     <Compile Include="CNN\InputOutputPair.cs" />
     <Compile Include="CNN\Kernel.cs" />
     <Compile Include="CNN\LayerOutput.cs" />
+    <Compile Include="CNN\MatrixUtils.cs" />
     <Compile Include="CNN\RGBPixel.cs" />
+    <Compile Include="CNN\SigmoidActivation.cs" />
+    <Compile Include="CNN\TotallyUselessGrayscaleController.cs" />
     <Compile Include="CNN\Unit.cs" />
     <Compile Include="CNN\Activation.cs" />
     <Compile Include="CNN\ConvolutionalLayer.cs" />
@@ -92,18 +88,17 @@
     <Compile Include="CNN\SoftmaxActivation.cs" />
     <Compile Include="CNN\Weight.cs" />
     <Compile Include="CNN\WeightType.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="Form2.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Form2.Designer.cs">
+      <DependentUpon>Form2.cs</DependentUpon>
     </Compile>
     <Compile Include="ImageProcessing.cs" />
-    <Compile Include="KerasNeuralNetwork.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="Form2.resx">
+      <DependentUpon>Form2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

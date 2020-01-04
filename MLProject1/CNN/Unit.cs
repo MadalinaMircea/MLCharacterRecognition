@@ -12,6 +12,8 @@ namespace MLProject1.CNN
         public double[] Weights { get; set; }
         public int NumberOfWeights { get; set; }
 
+        public double Bias { get; set; }
+
         [JsonIgnore]
         public double Output { get; set; }
 
@@ -22,22 +24,23 @@ namespace MLProject1.CNN
         }
 
         [JsonConstructor]
-        public Unit(int numberOfWeights, double[] weights)
+        public Unit(int numberOfWeights, double[] weights, double bias)
         {
             NumberOfWeights = numberOfWeights;
             Weights = weights;
+            Bias = bias;
         }
 
         private void InitializeRandom()
         {
-            Random rnd = new Random();
-
             Weights = new double[NumberOfWeights];
 
             for(int i = 0; i < NumberOfWeights; i++)
             {
-                Weights[0] = rnd.NextDouble();
+                Weights[i] = GlobalRandom.GetRandomWeight();
             }
+
+            Bias = GlobalRandom.GetRandomWeight();
         }
 
         public double ComputeOutput(FlattenedImage image)
@@ -49,8 +52,8 @@ namespace MLProject1.CNN
                 total += Weights[i] * image.Values[i];
             }
 
-            Output = total;
-            return total;
+            Output = total + Bias;
+            return Output;
         }
     }
 }

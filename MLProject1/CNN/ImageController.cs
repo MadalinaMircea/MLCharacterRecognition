@@ -25,8 +25,6 @@ namespace MLProject1.CNN
 
             Task[] tasks = new Task[directories.Length];
 
-            int n = 10;
-
             for(int i = 0; i < directories.Length; i++)
             {
                 int newI = 0 + i;
@@ -52,13 +50,13 @@ namespace MLProject1.CNN
             switch(set)
             {
                 case "train":
-                    Repo.TrainingSet = ReadFromDirectory(directory);
+                    Repo.TrainingSetPaths = ReadFromDirectory(directory);
                     break;
                 case "test":
-                    Repo.TestingSet = ReadFromDirectory(directory);
+                    Repo.TestingSetPaths = ReadFromDirectory(directory);
                     break;
                 case "valid":
-                    Repo.ValidationSet = ReadFromDirectory(directory);
+                    Repo.ValidationSetPaths = ReadFromDirectory(directory);
                     break;
 
             }
@@ -66,26 +64,21 @@ namespace MLProject1.CNN
 
         private List<InputOutputPair> Shuffle(List<InputOutputPair> set)
         {
-            Random rnd = new Random();
-
-            int numberOfShuffles = rnd.Next(50, 250);
-
-            for(int i = 0; i < numberOfShuffles; i++)
+            for(int i = 0; i < set.Count; i++)
             {
-                int x = rnd.Next(0, set.Count - 1);
-                int y = rnd.Next(0, set.Count - 1);
+                int x = GlobalRandom.GetRandomInt(i, set.Count);
                 InputOutputPair aux = set[x];
-                set[x] = set[y];
-                set[y] = aux;
+                set[x] = set[i];
+                set[i] = aux;
             }
 
             return set;
         }
         public void ShuffleSets()
         {
-            Task t1 = Task.Run(() => { Shuffle(Repo.TrainingSet); });
-            Task t2 = Task.Run(() => { Shuffle(Repo.TestingSet); });
-            Task t3 = Task.Run(() => { Shuffle(Repo.ValidationSet); });
+            Task t1 = Task.Run(() => { Shuffle(Repo.TrainingSetPaths); });
+            Task t2 = Task.Run(() => { Shuffle(Repo.TestingSetPaths); });
+            Task t3 = Task.Run(() => { Shuffle(Repo.ValidationSetPaths); });
 
             t1.Wait();
             t2.Wait();

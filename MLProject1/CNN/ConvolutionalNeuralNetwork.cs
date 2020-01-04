@@ -1,11 +1,11 @@
-﻿using HDF5DotNet;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MLProject1.CNN
@@ -15,11 +15,15 @@ namespace MLProject1.CNN
     {
         public InputLayer Input { get; }
         public List<NetworkLayer> NetworkLayers { get; }
-        public ConvolutionalNeuralNetwork(string modelFile, string weightsFile)
+
+        public string ColorScheme { get; set; }
+        public ConvolutionalNeuralNetwork(string modelFile, string weightsFile, string colorScheme = "rgb")
         {
             ConvolutionalNeuralNetwork item = LoadJson(modelFile);
             Input = item.Input;
             NetworkLayers = item.NetworkLayers;
+
+            ColorScheme = colorScheme;
         }
 
         //private void LoadWeightsFile(string weightsFile)
@@ -39,16 +43,20 @@ namespace MLProject1.CNN
         //}
 
         [JsonConstructor]
-        public ConvolutionalNeuralNetwork(InputLayer input, List<NetworkLayer> networkLayers)
+        public ConvolutionalNeuralNetwork(InputLayer input, List<NetworkLayer> networkLayers, string colorScheme = "rgb")
         {
             Input = input;
             NetworkLayers = networkLayers;
+
+            ColorScheme = colorScheme;
         }
 
-        public ConvolutionalNeuralNetwork(int inputSize)
+        public ConvolutionalNeuralNetwork(int inputSize, string colorScheme = "rgb")
         {
-            Input = new InputLayer(inputSize);
+            Input = new InputLayer(inputSize, colorScheme);
             NetworkLayers = new List<NetworkLayer>();
+
+            ColorScheme = colorScheme;
         }
 
         public void Add(NetworkLayer layer)
@@ -56,22 +64,168 @@ namespace MLProject1.CNN
             NetworkLayers.Add(layer);
         }
 
-        private void TrainModel()
+        private double GetError(double x, double y)
         {
-
+            return 1.0 / 2.0 * (x - y) * (x - y);
         }
 
-        public void Train(string trainingFolder, string validationFolder)
+        private FlattenedImage[] GetErrorArray(double[] actualOutput, double[] expectedOutput)
         {
-            foreach(string directoryPath in Directory.GetDirectories(trainingFolder))
-            {
+            FlattenedImage[] result = new FlattenedImage[actualOutput.Length];
 
+            for(int i = 0; i < actualOutput.Length; i++)
+            {
+                double[] value = new double[1];
+                //value[0] = GetError(actualOutput[i], expectedOutput[i]);
+                value[0] = actualOutput[i] - expectedOutput[i];
+                result[i] = new FlattenedImage(1, value);
+            }
+
+            return result;
+        }
+        public void Backpropagate(double[] actualOutput, double[] expectedOutput, double learningRate)
+        {
+            FlattenedImage[] error = GetErrorArray(actualOutput, expectedOutput);
+
+            LayerOutput[] nextError = NetworkLayers[NetworkLayers.Count - 1].Backpropagate(error, learningRate);
+
+            for (int i = NetworkLayers.Count - 2; i >= 0; i--)
+            {
+                nextError = NetworkLayers[i].Backpropagate(nextError, learningRate);
             }
         }
 
-        public void Evaluate()
+        public void Train(List<InputOutputPair> trainingSet, double learningRate)
         {
+            for (int image = 0; image < trainingSet.Count; image++)
+            {
+                FilteredImage input;
+                if (ColorScheme == "rgb")
+                {
+                    input = ImageProcessing.GetNormalizedFilteredImage(new Bitmap(trainingSet[image].Input));
+                }
+                else
+                {
+                    input = ImageProcessing.GetNormalizedGrayscaleFilteredImage(new Bitmap(trainingSet[image].Input));
+                }
+                double[] actualOutput = RecogniseImage(input);
+                Backpropagate(actualOutput, trainingSet[image].Output, learningRate);
+            }
+        }
 
+        private char GetReconisedChar(double[] output)
+        {
+            int maxi = 0;
+
+            for (int i = 0; i < output.Length; i++)
+            {
+                if (output[i] > output[maxi])
+                {
+                    maxi = i;
+                }
+            }
+
+            return (char)('A' + maxi);
+        }
+
+        public EvaluationMetrics Evaluate(List<InputOutputPair> set)
+        {
+            double error = 0;
+            int correct = 0, total = 0;
+
+            int N = set.Count;
+
+            for(int i = 0; i < N; i++)
+            {
+                InputOutputPair pair = set[i];
+
+                FilteredImage input;
+                if (ColorScheme == "rgb")
+                {
+                    input = ImageProcessing.GetNormalizedFilteredImage(new Bitmap(pair.Input));
+                }
+                else
+                {
+                    input = ImageProcessing.GetNormalizedGrayscaleFilteredImage(new Bitmap(pair.Input));
+                }
+
+                double[] actualOutput = RecogniseImage(input);
+
+                error += LeastSquaredError(actualOutput, pair.Output);
+
+                total++;
+
+                if (GetReconisedChar(actualOutput) == pair.OutputChar)
+                {
+                    correct++;
+                }
+            }
+
+
+            return new EvaluationMetrics(error, (double)correct / total);
+        }
+
+        public EvaluationMetrics EvaluateParallel(List<InputOutputPair> set)
+        {
+            double error = 0;
+            int correct = 0, total = 0;
+
+            object o = new object();
+
+            int N = set.Count;
+
+            Task[] tasks = new Task[N];
+
+            for (int i = 0; i < N; i++)
+            {
+                //int taski = GlobalRandom.GetRandomInt(0, set.Count);
+
+                int taski = 0 + i;
+
+                tasks[i] = Task.Run(() =>
+                {
+                    InputOutputPair pair = set[taski];
+
+                    FilteredImage input;
+                    if (ColorScheme == "rgb")
+                    {
+                        input = ImageProcessing.GetNormalizedFilteredImage(new Bitmap(pair.Input));
+                    }
+                    else
+                    {
+                        input = ImageProcessing.GetNormalizedGrayscaleFilteredImage(new Bitmap(pair.Input));
+                    }
+
+                    double[] actualOutput = RecogniseImage(input);
+
+                    Monitor.Enter(o);
+                    error += LeastSquaredError(actualOutput, pair.Output);
+
+                    total++;
+
+                    if (GetReconisedChar(actualOutput) == pair.OutputChar)
+                    {
+                        correct++;
+                    }
+                    Monitor.Exit(o);
+                });
+            }
+
+            Task.WaitAll(tasks);
+
+            return new EvaluationMetrics(error, (double)correct / total);
+        }
+
+        private double LeastSquaredError(double[] actual, double[] output)
+        {
+            double sum = 0;
+
+            for(int i = 0; i < actual.Length; i++)
+            {
+                sum += (actual[i] - output[i]) * (actual[i] - output[i]);
+            }
+
+            return Math.Sqrt(sum);
         }
 
         private double[] GetOutput()
@@ -84,7 +238,7 @@ namespace MLProject1.CNN
         {
             Input.SetInputImage(image);
 
-            foreach(NetworkLayer layer in NetworkLayers)
+            foreach (NetworkLayer layer in NetworkLayers)
             {
                 layer.ComputeOutput();
             }
