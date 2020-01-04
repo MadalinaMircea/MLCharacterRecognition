@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class LayerOutput
+    abstract class LayerOutput
     {
-        //public int NumberOfWeights { get; set; }
+        public abstract double Sum();
     }
 }

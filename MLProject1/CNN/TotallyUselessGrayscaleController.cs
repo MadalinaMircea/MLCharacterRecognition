@@ -11,54 +11,108 @@ namespace MLProject1.CNN
 {
     class TotallyUselessGrayscaleController
     {
-        ConvolutionalNeuralNetwork model;
+        NeuralNetwork model;
         ImageRepository Repo;
-        public void CreateAndCompileModel4()
+        //public void CreateAndCompileModel4()
+        //{
+        //    Console.WriteLine("Creating model");
+        //    GlobalRandom.InitializeRandom();
+
+        //    int imgSize = 75;
+
+        //    ReluActivation reluActivation = new ReluActivation();
+        //    SoftmaxActivation softmaxActivation = new SoftmaxActivation();
+
+        //    model = new ConvolutionalNeuralNetwork(imgSize, "grayscale");
+        //    model.Add(new ConvolutionalLayer(5, 3, reluActivation, "valid"));
+        //    model.Add(new MaxPoolingLayer());
+        //    model.Add(new ConvolutionalLayer(5, 3, reluActivation, "valid"));
+        //    model.Add(new MaxPoolingLayer());
+        //    model.Add(new DropoutLayer(0.2));
+        //    model.Add(new FlattenLayer());
+        //    model.Add(new DropoutLayer(0.2));
+        //    model.Add(new DenseLayer(26, softmaxActivation));
+
+        //    Console.WriteLine("Model created");
+
+        //    model.Compile();
+
+        //    Console.WriteLine("Model compiled");
+        //}
+
+        //public void CreateAndCompileModel5()
+        //{
+        //    Console.WriteLine("Creating model");
+        //    GlobalRandom.InitializeRandom();
+
+        //    int imgSize = 75;
+
+        //    SoftmaxActivation softmaxActivation = new SoftmaxActivation();
+        //    SigmoidActivation sigmoidActivation = new SigmoidActivation();
+
+        //    model = new ConvolutionalNeuralNetwork(imgSize, "grayscale");
+        //    model.Add(new ConvolutionalLayer(5, 3, sigmoidActivation, "valid"));
+        //    model.Add(new MaxPoolingLayer());
+        //    model.Add(new ConvolutionalLayer(5, 3, sigmoidActivation, "valid"));
+        //    model.Add(new MaxPoolingLayer());
+        //    model.Add(new DropoutLayer(0.2));
+        //    model.Add(new FlattenLayer());
+        //    model.Add(new DropoutLayer(0.2));
+        //    model.Add(new DenseLayer(26, softmaxActivation));
+
+        //    Console.WriteLine("Model created");
+
+        //    model.Compile();
+
+        //    Console.WriteLine("Model compiled");
+        //}
+
+        //internal void CreateAndCompileModel2()
+        //{
+        //    Console.WriteLine("Creating model");
+        //    GlobalRandom.InitializeRandom();
+
+        //    int imgSize = 75;
+
+        //    SoftmaxActivation softmaxActivation = new SoftmaxActivation();
+        //    ReluActivation reluActivation = new ReluActivation();
+
+        //    model = new ConvolutionalNeuralNetwork(imgSize, "grayscale");
+        //    model.Add(new ConvolutionalLayer(1, 5, reluActivation, "same"));
+        //    model.Add(new ConvolutionalLayer(1, 5, reluActivation, "same"));
+        //    model.Add(new ConvolutionalLayer(1, 5, reluActivation, "valid"));
+        //    model.Add(new MaxPoolingLayer());
+        //    model.Add(new ConvolutionalLayer(1, 5, reluActivation, "same"));
+        //    model.Add(new ConvolutionalLayer(1, 5, reluActivation, "same"));
+        //    model.Add(new ConvolutionalLayer(1, 5, reluActivation, "valid"));
+        //    model.Add(new MaxPoolingLayer());
+        //    model.Add(new DropoutLayer(0.2));
+        //    model.Add(new FlattenLayer());
+        //    model.Add(new DropoutLayer(0.2));
+        //    model.Add(new DenseLayer(26, softmaxActivation));
+
+        //    Console.WriteLine("Model created");
+
+        //    model.Compile();
+
+        //    Console.WriteLine("Model compiled");
+        //}
+
+        internal void CreateAndCompileModel3()
         {
             Console.WriteLine("Creating model");
             GlobalRandom.InitializeRandom();
 
             int imgSize = 75;
 
+            SoftmaxActivation softmaxActivation = new SoftmaxActivation();
             ReluActivation reluActivation = new ReluActivation();
-            SoftmaxActivation softmaxActivation = new SoftmaxActivation();
-
-            model = new ConvolutionalNeuralNetwork(imgSize, "grayscale");
-            model.Add(new ConvolutionalLayer(5, 3, reluActivation, "valid"));
-            model.Add(new MaxPoolingLayer());
-            model.Add(new ConvolutionalLayer(5, 3, reluActivation, "valid"));
-            model.Add(new MaxPoolingLayer());
-            model.Add(new DropoutLayer(0.2));
-            model.Add(new FlattenLayer());
-            model.Add(new DropoutLayer(0.2));
-            model.Add(new DenseLayer(26, softmaxActivation));
-
-            Console.WriteLine("Model created");
-
-            model.Compile();
-
-            Console.WriteLine("Model compiled");
-        }
-
-        public void CreateAndCompileModel5()
-        {
-            Console.WriteLine("Creating model");
-            GlobalRandom.InitializeRandom();
-
-            int imgSize = 75;
-
-            SoftmaxActivation softmaxActivation = new SoftmaxActivation();
             SigmoidActivation sigmoidActivation = new SigmoidActivation();
 
-            model = new ConvolutionalNeuralNetwork(imgSize, "grayscale");
-            model.Add(new ConvolutionalLayer(5, 3, sigmoidActivation, "valid"));
-            model.Add(new MaxPoolingLayer());
-            model.Add(new ConvolutionalLayer(5, 3, sigmoidActivation, "valid"));
-            model.Add(new MaxPoolingLayer());
-            model.Add(new DropoutLayer(0.2));
-            model.Add(new FlattenLayer());
-            model.Add(new DropoutLayer(0.2));
-            model.Add(new DenseLayer(26, softmaxActivation));
+            model = new NeuralNetwork(imgSize * imgSize);
+            model.Add(new DenseLayer(256, sigmoidActivation));
+            model.Add(new DenseLayer(128, sigmoidActivation));
+            model.Add(new DenseLayer(26, sigmoidActivation));
 
             Console.WriteLine("Model created");
 
@@ -69,7 +123,7 @@ namespace MLProject1.CNN
 
         public char RecogniseImage(Bitmap img)
         {
-            double[] resultProbs = model.RecogniseImage(ImageProcessing.GetNormalizedGrayscaleFilteredImage(img));
+            double[] resultProbs = model.RecogniseImage(ImageProcessing.GetNormalizedGrayscaleFlattenedImage(img));
             int maxi = -1;
             double maxx = -1;
 

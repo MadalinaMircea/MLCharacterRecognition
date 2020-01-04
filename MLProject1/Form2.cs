@@ -51,87 +51,96 @@ namespace MLProject1
             //    gch.Free();
             //}
 
-            GlobalRandom.InitializeRandom();
+            //GlobalRandom.InitializeRandom();
 
-            Task[] tasks = new Task[4];
+            //TotallyUselessGrayscaleController ctrl = new TotallyUselessGrayscaleController();
+            //ctrl.CreateAndCompileModel3();
+            //ctrl.WriteToFile("modelGrayscale.json", "modelGrayscale");
+            //ctrl.PrepareImageSets("data/Train", "data/Test", "data/Valid");
 
-            tasks[0] = Task.Run(() =>
-            {
-                try
-                {
-                    CNNController ctrl = new CNNController();
-                    ctrl.CreateAndCompileModel2();
-                    ctrl.WriteToFile("model1.json", "model1Weights");
-                    ctrl.PrepareImageSets("data/Train", "data/Test", "data/Valid");
+            ////ctrl.Test(1);
 
-                    ctrl.Test(1);
+            //ctrl.Train(1230, "modelGrayscale", 1, 0.1);
 
-                    ctrl.Train(208, "model1trainedWeights", 1, 0.075);
-                }
-                catch(Exception ex)
-                {
-                    Console.WriteLine("Process 1: " + ex.Message);
-                }
-            });
+            //Task[] tasks = new Task[4];
 
-            tasks[1] = Task.Run(() =>
-            {
-                try
-                {
-                    CNNController ctrl = new CNNController();
-                    ctrl.CreateAndCompileModel3();
-                    ctrl.WriteToFile("model2.json", "model2Weights");
-                    ctrl.PrepareImageSets("data/Train", "data/Test", "data/Valid");
+            //tasks[0] = Task.Run(() =>
+            //{
+            //    try
+            //    {
+            CNNController ctrl = new CNNController();
+            ctrl.CreateAndCompileModel2();
+            ctrl.WriteToFile("modelCorrect.json", "modelCorrect");
+            ctrl.PrepareImageSets("data/Train", "data/Test", "data/Valid");
 
-                    ctrl.Test(2);
+            //ctrl.Test(1);
 
-                    ctrl.Train(416, "model2trainedWeights", 2, 0.05);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Process 2: " + ex.ToString());
-                }
-            });
+            ctrl.Train(208, "modelCorrect", 1, 0.05);
+            //    }
+            //    catch(Exception ex)
+            //    {
+            //        Console.WriteLine("Process 1: " + ex.Message);
+            //    }
+            //});
 
-            tasks[2] = Task.Run(() =>
-            {
-                try
-                {
-                    TotallyUselessGrayscaleController ctrl = new TotallyUselessGrayscaleController();
-                    ctrl.CreateAndCompileModel4();
-                    ctrl.WriteToFile("model3.json", "model3Weights");
-                    ctrl.PrepareImageSets("data/Train", "data/Test", "data/Valid");
+            //tasks[1] = Task.Run(() =>
+            //{
+            //    try
+            //    {
+            //        CNNController ctrl = new CNNController();
+            //        ctrl.CreateAndCompileModel3();
+            //        ctrl.WriteToFile("model2.json", "model2Weights");
+            //        ctrl.PrepareImageSets("data/Train", "data/Test", "data/Valid");
 
-                    ctrl.Test(3);
+            //        ctrl.Test(2);
 
-                    ctrl.Train(104, "model3trainedWeights", 3, 0.01);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Process 3: " + ex.Message);
-                }
-            });
+            //        ctrl.Train(416, "model2trainedWeights", 2, 0.05);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine("Process 2: " + ex.ToString());
+            //    }
+            //});
 
-            tasks[3] = Task.Run(() =>
-            {
-                try
-                {
-                    TotallyUselessGrayscaleController ctrl = new TotallyUselessGrayscaleController();
-                    ctrl.CreateAndCompileModel5();
-                    ctrl.WriteToFile("model4.json", "model4Weights");
-                    ctrl.PrepareImageSets("data/Train", "data/Test", "data/Valid");
+            //tasks[2] = Task.Run(() =>
+            //{
+            //    try
+            //    {
+            //        TotallyUselessGrayscaleController ctrl = new TotallyUselessGrayscaleController();
+            //        ctrl.CreateAndCompileModel4();
+            //        ctrl.WriteToFile("model3.json", "model3Weights");
+            //        ctrl.PrepareImageSets("data/Train", "data/Test", "data/Valid");
 
-                    ctrl.Test(4);
+            //        ctrl.Test(3);
 
-                    ctrl.Train(104, "model4trainedWeights", 4, 0.01);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Process 4: " + ex.ToString());
-                }
-            });
+            //        ctrl.Train(104, "model3trainedWeights", 3, 0.01);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine("Process 3: " + ex.Message);
+            //    }
+            //});
 
-            Task.WaitAll(tasks);
+            //tasks[3] = Task.Run(() =>
+            //{
+            //    try
+            //    {
+            //        TotallyUselessGrayscaleController ctrl = new TotallyUselessGrayscaleController();
+            //        ctrl.CreateAndCompileModel5();
+            //        ctrl.WriteToFile("model4.json", "model4Weights");
+            //        ctrl.PrepareImageSets("data/Train", "data/Test", "data/Valid");
+
+            //        ctrl.Test(4);
+
+            //        ctrl.Train(104, "model4trainedWeights", 4, 0.01);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine("Process 4: " + ex.ToString());
+            //    }
+            //});
+
+            //Task.WaitAll(tasks);
 
             //controller.CreateAndCompileModel("same.json", "sameWeights");
             ////controller.WriteToFile("same.json", "sameWeights");

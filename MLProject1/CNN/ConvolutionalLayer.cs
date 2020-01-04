@@ -72,28 +72,30 @@ namespace MLProject1.CNN
             FilteredImageChannel[] channels = new FilteredImageChannel[FilterNumber];
             FilteredImage img = (FilteredImage)PreviousLayer.GetData();
 
-            //Task[] tasks = new Task[FilterNumber];
-
-            //for (int i = 0; i < FilterNumber; i++)
-            //{
-            //    int taski = 0 + i;
-
-            //    tasks[taski] = Task.Run(() =>
-            //    {
-            //        channels[taski] = Filters[taski].Convolve(img);
-            //    });
-            //}
-
-            //Task.WaitAll(tasks);
-
             bool samePadding = (Padding == "same") ? true : false;
+
+            Task[] tasks = new Task[FilterNumber];
 
             for (int i = 0; i < FilterNumber; i++)
             {
-                channels[i] = Filters[i].Convolve(img, samePadding);
+                int taski = 0 + i;
+
+                tasks[taski] = Task.Run(() =>
+                {
+                    channels[taski] = Filters[taski].Convolve(img, samePadding);
+                });
             }
 
-            OutputImage = (FilteredImage)ActivationFunction.Activate(new FilteredImage(FilterNumber, channels));
+            Task.WaitAll(tasks);
+
+            
+
+            //for (int i = 0; i < FilterNumber; i++)
+            //{
+            //    channels[i] = Filters[i].Convolve(img, samePadding);
+            //}
+
+            OutputImage = ActivationFunction.Activate(new FilteredImage(FilterNumber, channels));
         }
 
         public override void CompileLayer(NetworkLayer previousLayer)
@@ -124,7 +126,20 @@ namespace MLProject1.CNN
             FilteredImage previous = (FilteredImage)PreviousLayer.GetData();
 
             FilteredImage nextErrors = (FilteredImage)nextOutput[0];
-            FilteredImage activationDerivatives = (FilteredImage)ActivationFunction.GetDerivative(nextErrors);
+            FilteredImage activationDerivatives = ActivationFunction.GetDerivative(OutputImage);
+
+            for(int i = 0; i < nextErrors.NumberOfChannels; i++)
+            {
+                for(int j = 0; j < nextErrors.Size; j++)
+                {
+
+                    for(int k = 0; k < nextErrors.Size; k++)
+                    {
+                        nextErrors.Channels[i].Values[j, k] = 
+                            nextErrors.Channels[i].Values[j, k] * activationDerivatives.Channels[i].Values[j, k];
+                    }
+                }
+            }
 
             bool samePadding = (Padding == "same") ? true : false;
 
@@ -137,13 +152,19 @@ namespace MLProject1.CNN
                 tasks[taski] = Task.Run(() =>
                 {
                     newErrors[taski] = Filters[taski].Backpropagate(previous,
-                    activationDerivatives.Channels[taski], learningRate, samePadding);
+                        nextErrors.Channels[taski], learningRate, samePadding);
                 });
             }
 
             Task.WaitAll(tasks);
 
-            
+            //for (int i = 0; i < FilterNumber; i++)
+            //{
+            //    newErrors[i] = Filters[i].Backpropagate(previous,
+            //            nextErrors.Channels[i], learningRate, samePadding);
+            //}
+
+
 
             //for (int i = 0; i < FilterNumber; i++)
             //{

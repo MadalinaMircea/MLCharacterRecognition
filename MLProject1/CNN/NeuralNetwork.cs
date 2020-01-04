@@ -10,16 +10,15 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    [Serializable]
-    class ConvolutionalNeuralNetwork
+    class NeuralNetwork
     {
-        public InputLayer Input { get; }
+        public NeuralInputLayer Input { get; }
         public List<NetworkLayer> NetworkLayers { get; }
 
         public string ColorScheme { get; set; }
-        public ConvolutionalNeuralNetwork(string modelFile, string weightsFile, string colorScheme = "rgb")
+        public NeuralNetwork(string modelFile, string weightsFile, string colorScheme = "rgb")
         {
-            ConvolutionalNeuralNetwork item = LoadJson(modelFile);
+            NeuralNetwork item = LoadJson(modelFile);
             Input = item.Input;
             NetworkLayers = item.NetworkLayers;
 
@@ -43,7 +42,7 @@ namespace MLProject1.CNN
         //}
 
         [JsonConstructor]
-        public ConvolutionalNeuralNetwork(InputLayer input, List<NetworkLayer> networkLayers, string colorScheme = "rgb")
+        public NeuralNetwork(NeuralInputLayer input, List<NetworkLayer> networkLayers, string colorScheme = "rgb")
         {
             Input = input;
             NetworkLayers = networkLayers;
@@ -51,9 +50,9 @@ namespace MLProject1.CNN
             ColorScheme = colorScheme;
         }
 
-        public ConvolutionalNeuralNetwork(int inputSize, string colorScheme = "rgb")
+        public NeuralNetwork(int inputSize, string colorScheme = "rgb")
         {
-            Input = new InputLayer(inputSize, colorScheme);
+            Input = new NeuralInputLayer(inputSize, colorScheme);
             NetworkLayers = new List<NetworkLayer>();
 
             ColorScheme = colorScheme;
@@ -77,7 +76,7 @@ namespace MLProject1.CNN
 
             for (int i = 0; i < output.Length; i++)
             {
-                if(i == cInt)
+                if (i == cInt)
                 {
                     double log = -Math.Log(output[i]);
                     result[i] = new FlattenedImage(1, new double[1] { log });
@@ -91,43 +90,11 @@ namespace MLProject1.CNN
             return result;
         }
 
-
-
-        private FlattenedImage[] GetCrossentropyError(double[] output, double[] expected, char c)
-        {
-            FlattenedImage[] result = new FlattenedImage[output.Length];
-
-            double[] expectedExp = MatrixUtils.GetExp(expected);
-            double expectedSum = expected.Sum();
-
-            //int cInt = (int)(c - 65);
-
-            //for (int i = 0; i < output.Length; i++)
-            //{
-            //    if (i == cInt)
-            //    {
-            //        double log = -Math.Log(output[i]);
-            //        result[i] = new FlattenedImage(1, new double[1] { log });
-            //    }
-            //    else
-            //    {
-            //        result[i] = new FlattenedImage(1, new double[1] { 0 });
-            //    }
-            //}
-
-            for (int i = 0; i < output.Length; i++)
-            {
-                result[i] = new FlattenedImage(1, new double[1] { expectedExp[i]/expectedSum - output[i] });
-            }
-
-            return result;
-        }
-
         private FlattenedImage[] GetErrorArray(double[] actualOutput, double[] expectedOutput)
         {
             FlattenedImage[] result = new FlattenedImage[actualOutput.Length];
 
-            for(int i = 0; i < actualOutput.Length; i++)
+            for (int i = 0; i < actualOutput.Length; i++)
             {
                 double[] value = new double[1];
                 //value[0] = GetError(actualOutput[i], expectedOutput[i]);
@@ -137,12 +104,10 @@ namespace MLProject1.CNN
 
             return result;
         }
-        public void Backpropagate(double[] actualOutput, double[] expected, char outputChar, double learningRate)
+        public void Backpropagate(double[] actualOutput, char outputChar, double learningRate)
         {
-            FlattenedImage[] error = GetErrorArray(actualOutput, expected);
-            //FlattenedImage[] error = GetCrossentropyError(actualOutput, expected, outputChar);
+            FlattenedImage[] error = GetCrossentropyLoss(actualOutput, outputChar);
 
-            //LayerOutput[] nextError = ((DenseLayer)NetworkLayers[NetworkLayers.Count - 1]).Backpropagate(error, learningRate, outputChar - 65);
             LayerOutput[] nextError = NetworkLayers[NetworkLayers.Count - 1].Backpropagate(error, learningRate);
 
             for (int i = NetworkLayers.Count - 2; i >= 0; i--)
@@ -155,24 +120,19 @@ namespace MLProject1.CNN
         {
             for (int image = 0; image < trainingSet.Count; image++)
             {
-                FilteredImage input;
+                FlattenedImage input;
                 if (ColorScheme == "rgb")
                 {
-                    input = ImageProcessing.GetNormalizedFilteredImage(new Bitmap(trainingSet[image].Input));
+                    input = ImageProcessing.GetNormalizedFlattenedImage(new Bitmap(trainingSet[image].Input));
                 }
                 else
                 {
-                    input = ImageProcessing.GetNormalizedGrayscaleFilteredImage(new Bitmap(trainingSet[image].Input));
+                    input = ImageProcessing.GetNormalizedGrayscaleFlattenedImage(new Bitmap(trainingSet[image].Input));
                 }
 
                 double[] actualOutput = RecogniseImage(input);
 
-                Backpropagate(actualOutput, trainingSet[image].Output, trainingSet[image].OutputChar, learningRate);
-
-                if(Math.Abs(((ConvolutionalLayer)NetworkLayers[0]).Filters[0].Kernels[0].ElementSum) > 1000)
-                {
-                    throw new Exception("Weights over 1000");
-                }
+                Backpropagate(actualOutput, trainingSet[image].OutputChar, learningRate);
             }
         }
 
@@ -198,18 +158,18 @@ namespace MLProject1.CNN
 
             int N = set.Count;
 
-            for(int i = 0; i < N; i++)
+            for (int i = 0; i < N; i++)
             {
                 InputOutputPair pair = set[i];
 
-                FilteredImage input;
+                FlattenedImage input;
                 if (ColorScheme == "rgb")
                 {
-                    input = ImageProcessing.GetNormalizedFilteredImage(new Bitmap(pair.Input));
+                    input = ImageProcessing.GetNormalizedFlattenedImage(new Bitmap(pair.Input));
                 }
                 else
                 {
-                    input = ImageProcessing.GetNormalizedGrayscaleFilteredImage(new Bitmap(pair.Input));
+                    input = ImageProcessing.GetNormalizedGrayscaleFlattenedImage(new Bitmap(pair.Input));
                 }
 
                 double[] actualOutput = RecogniseImage(input);
@@ -249,14 +209,14 @@ namespace MLProject1.CNN
                 {
                     InputOutputPair pair = set[taski];
 
-                    FilteredImage input;
+                    FlattenedImage input;
                     if (ColorScheme == "rgb")
                     {
-                        input = ImageProcessing.GetNormalizedFilteredImage(new Bitmap(pair.Input));
+                        input = ImageProcessing.GetNormalizedFlattenedImage(new Bitmap(pair.Input));
                     }
                     else
                     {
-                        input = ImageProcessing.GetNormalizedGrayscaleFilteredImage(new Bitmap(pair.Input));
+                        input = ImageProcessing.GetNormalizedGrayscaleFlattenedImage(new Bitmap(pair.Input));
                     }
 
                     double[] actualOutput = RecogniseImage(input);
@@ -283,7 +243,7 @@ namespace MLProject1.CNN
         {
             double sum = 0;
 
-            for(int i = 0; i < actual.Length; i++)
+            for (int i = 0; i < actual.Length; i++)
             {
                 sum += (actual[i] - output[i]) * (actual[i] - output[i]);
             }
@@ -297,7 +257,7 @@ namespace MLProject1.CNN
             return result.Values;
         }
 
-        public double[] RecogniseImage(FilteredImage image)
+        public double[] RecogniseImage(FlattenedImage image)
         {
             Input.SetInputImage(image);
 
@@ -311,12 +271,12 @@ namespace MLProject1.CNN
             return GetOutput();
         }
 
-        private ConvolutionalNeuralNetwork LoadJson(string modelJson)
+        private NeuralNetwork LoadJson(string modelJson)
         {
             using (StreamReader r = File.OpenText(modelJson))
             {
                 string json = r.ReadToEnd();
-                ConvolutionalNeuralNetwork item = JsonConvert.DeserializeObject<ConvolutionalNeuralNetwork>(json);
+                NeuralNetwork item = JsonConvert.DeserializeObject<NeuralNetwork>(json);
 
                 return item;
             }
@@ -339,22 +299,5 @@ namespace MLProject1.CNN
                 //Output.CompileLayer(NetworkLayers[NetworkLayers.Count - 1]);
             }
         }
-
-        //public override string ToString()
-        //{
-        //    StringBuilder builder = new StringBuilder("{");
-        //    builder.Append(Input.ToString());
-        //    builder.Append(",\n[\n\"layers\":\n[");
-        //    foreach(NetworkLayer layer in networkLayers)
-        //    {
-        //        builder.Append(layer.ToString());
-        //        builder.Append(",\n");
-        //    }
-        //    builder.Append("\n],\n");
-        //    builder.Append(Output.ToString());
-        //    builder.Append("\n}");
-
-        //    return builder.ToString();
-        //}
     }
 }

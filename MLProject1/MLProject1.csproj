@@ -67,6 +67,9 @@
     <Compile Include="CNN\Kernel.cs" />
     <Compile Include="CNN\LayerOutput.cs" />
     <Compile Include="CNN\MatrixUtils.cs" />
+    <Compile Include="CNN\NeuralInputLayer.cs" />
+    <Compile Include="CNN\NeuralNetwork.cs" />
+    <Compile Include="CNN\PiecewiseActivation.cs" />
     <Compile Include="CNN\RGBPixel.cs" />
     <Compile Include="CNN\SigmoidActivation.cs" />
     <Compile Include="CNN\TotallyUselessGrayscaleController.cs" />

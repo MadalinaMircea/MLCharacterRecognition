@@ -15,32 +15,27 @@ namespace MLProject1.CNN
             return "softmax";
         }
 
-        public override LayerOutput Activate(LayerOutput output)
+        public override FlattenedImage Activate(FlattenedImage img)
         {
-            if (output is FilteredImage)
-            {
-                return null;
-            }
-
-            FlattenedImage img = (FlattenedImage)output;
-
             double sum = 0;
 
+            double[] result = new double[img.Size];
+
             for(int i = 0; i < img.Size; i++)
             {
-                img.Values[i] = Math.Exp(img.Values[i]);
-                sum += img.Values[i];
+                result[i] = Math.Exp(img.Values[i]);
+                sum += result[i];
             }
 
             for(int i = 0; i < img.Size; i++)
             {
-                img.Values[i] /= sum;
+                result[i] /= sum;
             }
 
-            return img;
+            return new FlattenedImage(img.Size, result);
         }
 
-        public override LayerOutput GetDerivative(LayerOutput output)
+        public override FlattenedImage GetDerivative(FlattenedImage image, int correctClass)
         {
             //FlattenedImage image = (FlattenedImage)output;
 
@@ -61,23 +56,29 @@ namespace MLProject1.CNN
 
             //return new FlattenedImage(image.Size, result);
 
-            FlattenedImage image = (FlattenedImage)output;
 
             double[] result = new double[image.Size];
 
             double totalSum = 0;
 
-            int correctClass = -1;
-
             for (int i = 0; i < image.Size; i++)
             {
-                totalSum += Math.Exp(image.Values[i]);
+                result[i] = Math.Exp(image.Values[i]);
+                totalSum += result[i];
             }
 
+            double squareSum = totalSum * totalSum;
+
             for (int i = 0; i < image.Size; i++)
             {
-                double e = Math.Exp(image.Values[i]);
-                result[i] = (e * (totalSum - e)) / (totalSum * totalSum);
+                if (i == correctClass)
+                {
+                    result[i] = (result[i] * (totalSum - result[i])) / squareSum;
+                }
+                else
+                {
+                    result[i] = (-result[correctClass] * result[i]) / squareSum;
+                }
             }
 
             return new FlattenedImage(image.Size, result);

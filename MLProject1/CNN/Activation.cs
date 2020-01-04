@@ -8,8 +8,14 @@ namespace MLProject1.CNN
 {
     abstract class Activation
     {
-        public abstract LayerOutput Activate(LayerOutput output);
+        public abstract FlattenedImage Activate(FlattenedImage img);
 
-        public abstract LayerOutput GetDerivative(LayerOutput output);
+        public virtual FilteredImage Activate(FilteredImage img) { throw new Exception(); }
+
+        public virtual FlattenedImage GetDerivative(FlattenedImage output) { throw new Exception(); }
+
+        public virtual FlattenedImage GetDerivative(FlattenedImage output, int correctClass) { throw new Exception(); }
+
+        public virtual FilteredImage GetDerivative(FilteredImage output) { throw new Exception(); }
     }
 }

@@ -98,8 +98,8 @@ namespace MLProject1.CNN
                    {
                        for (int channelJ = 0; channelJ + Pool < outputSize; channelJ += Pool)
                        {
-                           int maxi = -1, maxj = -1;
-                           double maxx = -1;
+                           int maxi = 0, maxj = 0;
+                           double maxx = input.Channels[taskc].Values[0, 0];
 
                            for (int poolI = 0; poolI < Pool; poolI++)
                            {

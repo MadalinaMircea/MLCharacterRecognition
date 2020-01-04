@@ -34,5 +34,17 @@ namespace MLProject1.CNN
             Channels = new FilteredImageChannel[numberOfChannels];
             Size = channelSize;
         }
+
+        public override double Sum()
+        {
+            double result = 0;
+
+            for(int c = 0; c < NumberOfChannels; c++)
+            {
+                result += MatrixUtils.ElementSum(Channels[c].Values);
+            }
+
+            return result;
+        }
     }
 }

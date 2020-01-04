@@ -66,7 +66,7 @@ namespace MLProject1.CNN
 
             Task.WaitAll(tasks);
 
-            Output = (FlattenedImage)ActivationFunction.Activate(Output);
+            Output = ActivationFunction.Activate(Output);
         }
 
         public override void CompileLayer(NetworkLayer previousLayer)
@@ -90,16 +90,16 @@ namespace MLProject1.CNN
             FlattenedImage[] result = new FlattenedImage[weightsPerUnit];
             FlattenedImage previous = (FlattenedImage)PreviousLayer.GetData();
 
-            FlattenedImage activationDerivative = (FlattenedImage)ActivationFunction.GetDerivative(Output);
-
             for(int i = 0; i < weightsPerUnit; i++)
             {
                 result[i] = new FlattenedImage(NumberOfUnits);
             }
 
+            FlattenedImage activationDerivative = ActivationFunction.GetDerivative(Output);
+
             Task[] tasks = new Task[NumberOfUnits];
 
-            for(int unit = 0; unit < NumberOfUnits; unit++)
+            for (int unit = 0; unit < NumberOfUnits; unit++)
             {
                 int tasku = 0 + unit;
 
@@ -124,6 +124,86 @@ namespace MLProject1.CNN
             }
 
             Task.WaitAll(tasks);
+
+            //for (int unit = 0; unit < NumberOfUnits; unit++)
+            //{
+            //    Unit unitAux = Units[unit];
+
+            //        FlattenedImage nextErrors = (FlattenedImage)nextOutput[unit];
+
+            //        double unitSum = nextErrors.Sum();
+            //        double unitDerivative = unitSum * activationDerivative.Values[unit];
+
+            //        for (int weight = 0; weight < unitAux.NumberOfWeights; weight++)
+            //        {
+            //            Monitor.Enter(result);
+            //            result[weight].Values[unit] = unitDerivative * unitAux.Weights[weight];
+            //            Monitor.Exit(result);
+            //            double deltaW = unitDerivative * previous.Values[weight];
+            //            unitAux.Weights[weight] -= learningRate * deltaW;
+            //        }
+            //}
+
+            return result;
+        }
+
+        public LayerOutput[] Backpropagate(LayerOutput[] nextOutput, double learningRate, int correctClass)
+        {
+            int weightsPerUnit = Units[0].NumberOfWeights;
+            FlattenedImage[] result = new FlattenedImage[weightsPerUnit];
+            FlattenedImage previous = (FlattenedImage)PreviousLayer.GetData();
+
+            for (int i = 0; i < weightsPerUnit; i++)
+            {
+                result[i] = new FlattenedImage(NumberOfUnits);
+            }
+
+            FlattenedImage activationDerivative = ActivationFunction.GetDerivative(Output, correctClass);
+
+            Task[] tasks = new Task[NumberOfUnits];
+
+            for (int unit = 0; unit < NumberOfUnits; unit++)
+            {
+                int tasku = 0 + unit;
+
+                tasks[tasku] = Task.Run(() =>
+                {
+                    Unit unitAux = Units[tasku];
+
+                    FlattenedImage nextErrors = (FlattenedImage)nextOutput[tasku];
+
+                    double unitSum = nextErrors.Values.Sum();
+                    double unitDerivative = unitSum * activationDerivative.Values[tasku];
+
+                    for (int weight = 0; weight < unitAux.NumberOfWeights; weight++)
+                    {
+                        Monitor.Enter(result);
+                        result[weight].Values[tasku] = unitDerivative * unitAux.Weights[weight];
+                        Monitor.Exit(result);
+                        double deltaW = unitDerivative * previous.Values[weight];
+                        unitAux.Weights[weight] -= learningRate * deltaW;
+                    }
+                });
+            }
+
+            Task.WaitAll(tasks);
+
+            //for (int unit = 0; unit < NumberOfUnits; unit++)
+            //{
+            //    Unit unitAux = Units[unit];
+
+            //    double unitSum = nextOutput[unit].Sum();
+            //    double unitDerivative = unitSum * activationDerivative.Values[unit];
+
+            //    for (int weight = 0; weight < unitAux.NumberOfWeights; weight++)
+            //    {
+            //        Monitor.Enter(result);
+            //        result[weight].Values[unit] = unitDerivative * unitAux.Weights[weight];
+            //        Monitor.Exit(result);
+            //        double deltaW = unitDerivative * previous.Values[weight];
+            //        unitAux.Weights[weight] -= learningRate * deltaW;
+            //    }
+            //}
 
             return result;
         }

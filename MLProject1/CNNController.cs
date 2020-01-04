@@ -56,7 +56,7 @@ namespace MLProject1
             SoftmaxActivation softmaxActivation = new SoftmaxActivation();
             SigmoidActivation sigmoidActivation = new SigmoidActivation();
 
-            model = new ConvolutionalNeuralNetwork(imgSize);
+            model = new ConvolutionalNeuralNetwork(imgSize, "grayscale");
             model.Add(new ConvolutionalLayer(5, 5, reluActivation, "valid"));
             model.Add(new MaxPoolingLayer());
             model.Add(new ConvolutionalLayer(5, 3, reluActivation, "valid"));
@@ -64,7 +64,7 @@ namespace MLProject1
             model.Add(new DropoutLayer(0.2));
             model.Add(new FlattenLayer());
             model.Add(new DropoutLayer(0.5));
-            model.Add(new DenseLayer(26, softmaxActivation));
+            model.Add(new DenseLayer(26, sigmoidActivation));
 
             Console.WriteLine("Model created");
 

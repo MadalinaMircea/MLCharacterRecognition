@@ -21,5 +21,10 @@ namespace MLProject1.CNN
             Size = size;
             Values = new double[size];
         }
+
+        public override double Sum()
+        {
+            return Values.Sum();
+        }
     }
 }

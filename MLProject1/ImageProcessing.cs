@@ -102,6 +102,66 @@ namespace MLProject1
             return (pixel.R == 255 && pixel.G == 255 && pixel.B == 255);
         }
 
+        internal static FlattenedImage GetNormalizedFlattenedImage(Bitmap bitmap)
+        {
+            using (Bitmap bmp = new Bitmap(bitmap))
+            {
+                int height = bitmap.Height;
+
+                int size = height * height * 3;
+
+                double[] values = new double[size];
+                int index = 0;
+
+                for (int i = 0; i < bitmap.Height; i++)
+                {
+                    for (int j = 0; j < bitmap.Height; j++)
+                    {
+                        Color color = bmp.GetPixel(j, i);
+                        values[index] = (255 - color.R) / 255.0;
+                        index++;
+                        values[index] = (255 - color.G) / 255.0;
+                        index++;
+                        values[index] = (255 - color.B) / 255.0;
+                        index++;
+                    }
+                }
+
+
+                FlattenedImage image = new FlattenedImage(size, values);
+
+                return image;
+            }
+        }
+
+        internal static FlattenedImage GetNormalizedGrayscaleFlattenedImage(Bitmap bitmap)
+        {
+            using (Bitmap bmp = new Bitmap(bitmap))
+            {
+                int height = bitmap.Height;
+
+                int size = height * height;
+
+                double[] values = new double[size];
+                int index = 0;
+
+                for (int i = 0; i < bitmap.Height; i++)
+                {
+                    for (int j = 0; j < bitmap.Height; j++)
+                    {
+                        Color color = bmp.GetPixel(j, i);
+                        values[index] = (255 - (color.R + color.G + color.B) / 3) / 255.0;
+                        index++;
+                    }
+                }
+
+
+                FlattenedImage image = new FlattenedImage(size, values);
+
+                return image;
+            }
+        }
+
         private static bool IsRowWhite(Bitmap image, int row)
         {
             for (int i = 0; i < image.Width; i++)
@@ -410,7 +470,7 @@ namespace MLProject1
                         //greenChannel[i, j] = color.G / 255.0;
                         //blueChannel[i, j] = color.B / 255.0;
 
-                        channel[i, j] = ((color.R + color.G + color.B) / 3) / 255.0;
+                        channel[i, j] = (255 - (color.R + color.G + color.B) / 3) / 255.0;
                     }
                 }
 

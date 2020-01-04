@@ -138,6 +138,17 @@ namespace MLProject1.CNN
             return result;
         }
 
+        public static double[] GetExp(double[] input)
+        {
+            double[] result = new double[input.Length];
+
+            for(int i = 0; i < input.Length; i++)
+            {
+                result[i] = Math.Exp(input[i]);
+            }
+
+            return result;
+        }
         public static double[,] FullConvolution(double[,] matrix, double[,] kernel)
         {
             int kernelSize = kernel.GetLength(0);
@@ -246,14 +257,33 @@ namespace MLProject1.CNN
                 }
             }
         }
+
+        public static double[,] CopyMatrix(double[,] matrix)
+        {
+            int n = matrix.GetLength(0);
+            int m = matrix.GetLength(1);
+
+            double[,] result = new double[n, m];
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < m; j++)
+                {
+                    result[i, j] = matrix[i, j];
+                }
+            }
+
+            return result;
+        }
         public static double[,] Rotate180(double[,] matrix)
         {
-            Transpose(matrix);
-            ReverseColumns(matrix);
-            Transpose(matrix);
-            ReverseColumns(matrix);
+            double[,] result = CopyMatrix(matrix);
+            Transpose(result);
+            ReverseColumns(result);
+            Transpose(result);
+            ReverseColumns(result);
 
-            return matrix;
+            return result;
         }
 
         public static double ElementSum(double[,] matrix)
