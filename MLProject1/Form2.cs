@@ -29,10 +29,10 @@ namespace MLProject1
 
         int i = 0;
 
-        string path = "C:\\Users\\Madalina\\Desktop\\UnityCNN\\image";
-        string imagePath = "C:\\Users\\Madalina\\Desktop\\UnityCNN\\image.jpg";
-        string newImagePath = "C:\\Users\\Madalina\\Desktop\\UnityCNN\\image2.jpg";
-        string responsePath = "C:\\Users\\Madalina\\Desktop\\UnityCNN\\image.txt";
+        string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\UnityCNN";
+        string imagePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\UnityCNN\\image.jpg";
+        string newImagePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\UnityCNN\\image2.jpg";
+        string responsePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\UnityCNN\\image.txt";
 
         KerasController ctrl = new KerasController("smallModel.json", "smallBest.h5");
 
@@ -54,11 +54,16 @@ namespace MLProject1
         {
             InitializeComponent();
 
+            if(!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
             //StartCNNForUnity();
 
-            StartKerasForUnity();
+           // StartKerasForUnity();
 
-            //StartCNNForForm();
+            StartCNNForForm();
 
             ClearPicture();
 
@@ -68,7 +73,7 @@ namespace MLProject1
         {
             GlobalRandom.InitializeRandom();
 
-            controller.CreateAndCompileModel("same.json", "sameWeights");
+            controller.CreateAndCompileModel("modelCorrect.json", "modelCorrect");
         }
 
         private void StartTrainingTasks()
@@ -141,7 +146,7 @@ namespace MLProject1
         {
             GlobalRandom.InitializeRandom();
 
-            controller.CreateAndCompileModel("same.json", "sameWeights");
+            controller.CreateAndCompileModel("modelCorrect.json", "modelCorrect");
 
             while (true)
             {
@@ -166,8 +171,8 @@ namespace MLProject1
         {
             GlobalRandom.InitializeRandom();
 
-            controller.CreateAndCompileModel("same.json", "sameWeights");
-            //controller.WriteToFile("same.json", "sameWeights");
+            controller.CreateAndCompileModel3();
+            controller.WriteToFile("newModel.json", "newModel");
 
             controller.PrepareImageSets("data/Train", "data/Test", "data/Valid");
 
@@ -215,7 +220,7 @@ namespace MLProject1
             //the last clicked point is reinitialized
             lastPoint = Point.Empty;
         }
-
+        
         private void clearButton_Click(object sender, EventArgs e)
         {
             ClearPicture();

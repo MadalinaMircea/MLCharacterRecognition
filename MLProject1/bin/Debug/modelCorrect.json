@@ -1,0 +1,47 @@
+{
+  "Input": {
+    "Size": 75,
+    "Type": "Input"
+  },
+  "NetworkLayers": [
+    {
+      "FilterNumber": 5,
+      "FilterSize": 5,
+      "ActivationFunction": "relu",
+      "Padding": "same",
+      "Type": "Convolutional"
+    },
+    {
+      "Pool": 2,
+      "Type": "MaxPooling"
+    },
+    {
+      "FilterNumber": 5,
+      "FilterSize": 3,
+      "ActivationFunction": "relu",
+      "Padding": "same",
+      "Type": "Convolutional"
+    },
+    {
+      "Pool": 2,
+      "Type": "MaxPooling"
+    },
+    {
+      "Rate": 0.2,
+      "Type": "Dropout"
+    },
+    {
+      "Type": "Flatten"
+    },
+    {
+      "Rate": 0.5,
+      "Type": "Dropout"
+    },
+    {
+      "NumberOfUnits": 26,
+      "ActivationFunction": "softmax",
+      "Type": "Dense"
+    }
+  ],
+  "ColorScheme": "rgb"
+}
