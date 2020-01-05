@@ -9,8 +9,6 @@ namespace MLProject1.CNN
 {
     class InputOutputPair
     {
-        //public FilteredImage Input { get; set; }
-
         public string Input { get; set; }
         public double[] Output { get; set; }
 

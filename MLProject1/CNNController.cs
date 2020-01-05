@@ -127,32 +127,6 @@ namespace MLProject1
             Console.WriteLine("Model compiled");
         }
 
-
-        //public void CreateSimpleModel()
-        //{
-        //    GlobalRandom.InitializeRandom();
-
-        //    SigmoidActivation sigmoidActivation = new SigmoidActivation();
-
-        //    model = new ConvolutionalNeuralNetwork(1);
-        //    model.Add(new DenseLayer(2, sigmoidActivation));
-        //    model.Add(new DenseLayer(2, sigmoidActivation));
-
-        //    model.Compile();
-
-        //    string json = JsonConvert.SerializeObject(model, Formatting.Indented);
-        //    File.WriteAllText("simpleJson.json", json);
-        //    WriteWeightsToDirectory("simpleWeights");
-        //}
-
-        //public void TrainSimple()
-        //{
-        //    FlattenedImage img = new FlattenedImage(2, new double[2] { 0.05, 0.1 });
-
-        //    double[] actualOutput = model.RecogniseImage(img);
-        //    model.Backpropagate(actualOutput, new double[2] { 0.01, 0.99 }, 0.5);
-        //}
-
         public void CreateAndCompileModel(string jsonPath, string weightsDirectory)
         {
             Console.WriteLine("Creating model");
@@ -330,12 +304,6 @@ namespace MLProject1
                                 string filterPath = layerPath + "\\Filter" + filter + ".json";
                                 string json = File.ReadAllText(filterPath);
                                 auxLayer.Filters[filter] = JsonConvert.DeserializeObject<Filter>(json);
-
-                                //for (int kernel = 0; kernel < auxFilter.KernelNumber; kernel++)
-                                //{
-                                //    string json = File.ReadAllText(filterPath + "\\Kernel" + kernel + ".json");
-                                //    auxFilter.Kernels[kernel] = JsonConvert.DeserializeObject<Kernel>(json);
-                                //}
                             }
                             break;
                         case "Dense":
@@ -354,83 +322,6 @@ namespace MLProject1
 
             Task.WaitAll(tasks);
         }
-
-        //public void ReadWeightsFromH5(string weightFile)
-        //{
-
-        //    //Task[] tasks = new Task[model.NetworkLayers.Count];
-
-        //    int convNr = 1, denseNr = 1;
-        //    string initialPath = "/model_weights/";
-
-        //    H5FileId fileId = H5F.open(weightFile, H5F.OpenMode.ACC_RDONLY);
-
-        //    for (int i = 0; i < model.NetworkLayers.Count; i++)
-        //    {
-        //        int taski = 0 + i;
-
-        //        //tasks[taski] = Task.Run(() =>
-        //        //{
-        //            switch (model.NetworkLayers[taski].Type)
-        //            {
-        //                case "Convolutional":
-        //                    ConvolutionalLayer auxLayer = (ConvolutionalLayer)model.NetworkLayers[taski];
-
-        //                    string pathAddition = "conv2d_" + convNr;
-        //                    string path = initialPath + pathAddition + "/" + pathAddition;
-
-        //                    H5GroupId convGroupId = H5G.open(fileId, path);
-
-        //                    H5DataSetId convDatasetId = H5D.open(convGroupId, "bias:0");
-
-        //                    H5DataTypeId datatypeId = H5D.getType(convDatasetId);
-
-        //                    double[,] arr = new double[auxLayer.FilterNumber, 1];
-        //                    H5Array<double> array = new H5Array<double>(arr);
-
-        //                    H5D.read(convDatasetId, datatypeId, array);
-
-        //                    auxLayer.SetBias(arr);
-
-        //                    for (int filter = 0; filter < auxLayer.FilterNumber; filter++)
-        //                    {
-        //                        convDatasetId = H5D.open(convGroupId, "kernel:0");
-
-        //                        datatypeId = H5D.getType(convDatasetId);
-
-        //                        double[,,,] filterArr = new double[auxLayer.FilterSize, auxLayer.FilterSize,auxLayer.Filters[0].KernelNumber,auxLayer.FilterNumber];
-        //                        H5Array<double> filterArray = new H5Array<double>(filterArr);
-
-        //                    H5D.read(convDatasetId, datatypeId, filterArray);
-
-        //                        Filter auxFilter = auxLayer.Filters[filter];
-
-        //                        for (int kernel = 0; kernel < auxFilter.KernelNumber; kernel++)
-        //                        {
-        //                            //string json = File.ReadAllText(filterPath + "\\Kernel" + kernel + ".json");
-        //                            //auxFilter.Kernels[kernel] = JsonConvert.DeserializeObject<Kernel>(json);
-        //                        }
-        //                    }
-        //                    break;
-        //                case "Dense":
-        //                    //DenseLayer auxDense = (DenseLayer)model.NetworkLayers[taski];
-        //                    //for (int unit = 0; unit < auxDense.NumberOfUnits; unit++)
-        //                    //{
-        //                    //    string json = File.ReadAllText(layerPath + "\\Unit" + unit + ".json");
-        //                    //    auxDense.Units[unit] = JsonConvert.DeserializeObject<Unit>(json);
-        //                    //}
-        //                    break;
-        //                default:
-        //                    break;
-        //            }
-        //        //});
-        //    }
-
-        //    //Task.WaitAll(tasks);
-
-            
-        //}
-
         public void PrepareImageSets(string trainingPath, string testingPath, string validationPath)
         {
             Console.WriteLine("Preparing dataset");

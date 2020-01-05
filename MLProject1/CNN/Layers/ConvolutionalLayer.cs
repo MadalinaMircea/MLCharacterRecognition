@@ -48,6 +48,10 @@ namespace MLProject1.CNN
             {
                 ActivationFunction = new SoftmaxActivation();
             }
+            else if (activationFunction == "sigmoid")
+            {
+                ActivationFunction = new SigmoidActivation();
+            }
 
             Filters = new Filter[filterNumber];
 

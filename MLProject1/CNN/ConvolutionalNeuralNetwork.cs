@@ -26,22 +26,6 @@ namespace MLProject1.CNN
             ColorScheme = colorScheme;
         }
 
-        //private void LoadWeightsFile(string weightsFile)
-        //{
-        //    H5FileId fileId = H5F.open(weightsFile, H5F.OpenMode.ACC_RDONLY);
-
-        //    H5GroupId groupId = H5G.open(fileId, "/model_weights/conv2d_1/conv2d_1");
-
-        //    H5DataSetId datasetId = H5D.open(groupId, "bias:0");
-
-        //    H5DataTypeId datatypeId = H5D.getType(datasetId);
-
-        //    float[,] arr = new float[32, 1];
-        //    H5Array<float> array = new H5Array<float>(arr);
-
-        //    H5D.read<float>(datasetId, datatypeId, array);
-        //}
-
         [JsonConstructor]
         public ConvolutionalNeuralNetwork(InputLayer input, List<NetworkLayer> networkLayers, string colorScheme = "rgb")
         {
@@ -241,8 +225,6 @@ namespace MLProject1.CNN
 
             for (int i = 0; i < N; i++)
             {
-                //int taski = GlobalRandom.GetRandomInt(0, set.Count);
-
                 int taski = 0 + i;
 
                 tasks[i] = Task.Run(() =>
@@ -306,8 +288,6 @@ namespace MLProject1.CNN
                 layer.ComputeOutput();
             }
 
-            //Output.ComputeOutput();
-
             return GetOutput();
         }
 
@@ -336,25 +316,7 @@ namespace MLProject1.CNN
                 {
                     NetworkLayers[i].CompileLayer(NetworkLayers[i - 1]);
                 }
-                //Output.CompileLayer(NetworkLayers[NetworkLayers.Count - 1]);
             }
         }
-
-        //public override string ToString()
-        //{
-        //    StringBuilder builder = new StringBuilder("{");
-        //    builder.Append(Input.ToString());
-        //    builder.Append(",\n[\n\"layers\":\n[");
-        //    foreach(NetworkLayer layer in networkLayers)
-        //    {
-        //        builder.Append(layer.ToString());
-        //        builder.Append(",\n");
-        //    }
-        //    builder.Append("\n],\n");
-        //    builder.Append(Output.ToString());
-        //    builder.Append("\n}");
-
-        //    return builder.ToString();
-        //}
     }
 }
