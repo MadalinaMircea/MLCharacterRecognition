@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class Unit
+    public class Unit
     {
         public double[] Weights { get; set; }
         public int NumberOfWeights { get; set; }
@@ -37,10 +37,10 @@ namespace MLProject1.CNN
 
             for(int i = 0; i < NumberOfWeights; i++)
             {
-                Weights[i] = GlobalRandom.GetRandomWeight();
+                Weights[i] = GlobalRandom.GetRandomWeight() / NumberOfWeights;
             }
 
-            Bias = GlobalRandom.GetRandomWeight();
+            Bias = 0;
         }
 
         public double ComputeOutput(FlattenedImage image)

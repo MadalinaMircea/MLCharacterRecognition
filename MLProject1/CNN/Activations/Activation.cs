@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    abstract class Activation
+    public abstract class Activation
     {
         public abstract FlattenedImage Activate(FlattenedImage img);
 

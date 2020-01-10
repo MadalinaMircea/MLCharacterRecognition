@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    abstract class PiecewiseActivation : Activation
+    public abstract class PiecewiseActivation : Activation
     {
         public override FlattenedImage Activate(FlattenedImage img)
         {

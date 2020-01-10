@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace MLProject1.CNN
 {
     [Serializable]
-    class InputLayer : NetworkLayer
+    public class InputLayer : NetworkLayer
     {
         public int Size { get; set; }
 

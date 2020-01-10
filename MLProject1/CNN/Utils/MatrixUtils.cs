@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    static class MatrixUtils
+    public static class MatrixUtils
     {
         static void ReverseColumns(double[,] matrix)
         {
@@ -37,7 +37,7 @@ namespace MLProject1.CNN
 
                 tasks[taski] = Task.Run(() =>
                 {
-                    for (int outputJ = 0; outputJ < resultSize ; outputJ++)
+                    for (int outputJ = 0; outputJ < resultSize; outputJ++)
                     {
                         double total = 0;
                         for (int kernelI = 0; kernelI < kernel.GetLength(0); kernelI++)
@@ -46,6 +46,8 @@ namespace MLProject1.CNN
                             {
                                 int indexI = taski + kernelI;
                                 int indexJ = outputJ + kernelJ;
+                                //int indexI = taski - kernelI;
+                                //int indexJ = outputJ - kernelJ;
                                 total += matrix[indexI, indexJ] * kernel[kernelI, kernelJ];
                             }
                         }
@@ -187,6 +189,31 @@ namespace MLProject1.CNN
 
             Task.WaitAll(tasks);
 
+
+
+
+            //for (int outputI = 0; outputI < outputSize; outputI++)
+            //{
+            //    for (int outputJ = 0; outputJ < outputSize; outputJ++)
+            //    {
+            //        double total = 0;
+            //        for (int kernelI = 0; kernelI < kernelSize; kernelI++)
+            //        {
+            //            for (int kernelJ = 0; kernelJ < kernelSize; kernelJ++)
+            //            {
+            //                int indexI = outputI + kernelI - kernelSize + 1;
+            //                int indexJ = outputJ + kernelJ - kernelSize + 1;
+
+            //                if (indexI >= 0 && indexI < matrixSize && indexJ >= 0 && indexJ < matrixSize)
+            //                {
+            //                    total += matrix[indexI, indexJ] * kernel[kernelI, kernelJ];
+            //                }
+            //            }
+            //        }
+            //        result[outputI, outputJ] = total;
+            //    }
+            //}
+
             return result;
         }
 
@@ -275,16 +302,16 @@ namespace MLProject1.CNN
 
             return result;
         }
-        public static double[,] Rotate180(double[,] matrix)
-        {
-            double[,] result = CopyMatrix(matrix);
-            Transpose(result);
-            ReverseColumns(result);
-            Transpose(result);
-            ReverseColumns(result);
+        //public static double[,] Rotate180(double[,] matrix)
+        //{
+        //    double[,] result = CopyMatrix(matrix);
+        //    Transpose(result);
+        //    ReverseColumns(result);
+        //    Transpose(result);
+        //    ReverseColumns(result);
 
-            return result;
-        }
+        //    return result;
+        //}
 
         public static double ElementSum(double[,] matrix)
         {

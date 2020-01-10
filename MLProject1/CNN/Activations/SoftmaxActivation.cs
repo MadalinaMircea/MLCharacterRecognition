@@ -8,22 +8,40 @@ using System.Threading.Tasks;
 namespace MLProject1.CNN
 {
     [JsonConverter(typeof(ToStringJsonConverter))]
-    class SoftmaxActivation : Activation
+    public class SoftmaxActivation : Activation
     {
+        FlattenedImage lastOutput;
         public override string ToString()
         {
             return "softmax";
         }
 
+        private double[] CopyArray(double[] arr)
+        {
+            int size = arr.Length;
+            double[] result = new double[size];
+
+            for (int i = 0; i < size; i++)
+            {
+                result[i] = arr[i];
+            }
+
+            return result;
+        }
+
         public override FlattenedImage Activate(FlattenedImage img)
         {
+            lastOutput = new FlattenedImage(img.Size, CopyArray(img.Values));
+
             double sum = 0;
 
             double[] result = new double[img.Size];
 
-            for(int i = 0; i < img.Size; i++)
+            double maxx = img.Values.Max();
+
+            for (int i = 0; i < img.Size; i++)
             {
-                result[i] = Math.Exp(img.Values[i]);
+                result[i] = Math.Exp(img.Values[i]);// - maxx);
                 sum += result[i];
             }
 
@@ -35,7 +53,7 @@ namespace MLProject1.CNN
             return new FlattenedImage(img.Size, result);
         }
 
-        public override FlattenedImage GetDerivative(FlattenedImage image, int correctClass)
+        public override FlattenedImage GetDerivative(FlattenedImage gradient, int correctClass)
         {
             //FlattenedImage image = (FlattenedImage)output;
 
@@ -56,32 +74,35 @@ namespace MLProject1.CNN
 
             //return new FlattenedImage(image.Size, result);
 
+            double correctClassGradient = gradient.Values[0];
 
-            double[] result = new double[image.Size];
+            double[] result = new double[lastOutput.Size];
 
             double totalSum = 0;
 
-            for (int i = 0; i < image.Size; i++)
+            double maxx = lastOutput.Values.Max();
+
+            for (int i = 0; i < lastOutput.Size; i++)
             {
-                result[i] = Math.Exp(image.Values[i]);
+                result[i] = Math.Exp(lastOutput.Values[i]);// - maxx);
                 totalSum += result[i];
             }
 
             double squareSum = totalSum * totalSum;
 
-            for (int i = 0; i < image.Size; i++)
+            for (int i = 0; i < result.Length; i++)
             {
                 if (i == correctClass)
                 {
-                    result[i] = (result[i] * (totalSum - result[i])) / squareSum;
+                    result[i] = correctClassGradient * ((result[i] * (totalSum - result[i])) / squareSum);
                 }
                 else
                 {
-                    result[i] = (-result[correctClass] * result[i]) / squareSum;
+                    result[i] = correctClassGradient * ((-result[correctClass] * result[i]) / squareSum);
                 }
             }
 
-            return new FlattenedImage(image.Size, result);
+            return new FlattenedImage(result.Length, result);
         }
     }
 }

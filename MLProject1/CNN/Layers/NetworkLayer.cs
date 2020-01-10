@@ -9,7 +9,7 @@ namespace MLProject1.CNN
 {
     [Serializable]
     [JsonConverter(typeof(NetworkLayerConverter))]
-    abstract class NetworkLayer
+    public abstract class NetworkLayer
     {
         public string Type { get; }
 

@@ -13,16 +13,16 @@ using System.Threading.Tasks;
 
 namespace MLProject1
 {
-    class KerasController
+    public class KerasController
     {
         BaseModel model;
         public KerasController(string modelFile, string weightsFile)
         {
-            //Sequential newModel = CreateModel();
-            //model = newModel;
-            //WriteModelToFiles(modelFile, weightsFile);
+            Sequential newModel = CreateModel();
+            model = newModel;
+            WriteModelToFiles(modelFile, weightsFile);
             //model = FitAndEvaluate(newModel, weightsFile);
-            model = LoadModel(modelFile, weightsFile);
+            //model = LoadModel(modelFile, weightsFile);
         }
 
         private void WriteModelToFiles(string modelFile, string weightFile)
@@ -35,7 +35,7 @@ namespace MLProject1
 
             File.WriteAllText(modelFile, modelJson);
             //serialize weights to HDF5
-            model.SaveWeight(weightFile);
+            //model.SaveWeight(weightFile);
         }
 
         private Sequential CreateModel()

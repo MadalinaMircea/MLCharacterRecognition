@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    abstract class LayerOutput
+    public abstract class LayerOutput
     {
         public abstract double Sum();
     }

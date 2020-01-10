@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace MLProject1
 {
-    class CNNController
+    public class CNNController
     {
         ConvolutionalNeuralNetwork model;
-        ImageRepository Repo;
+        ImageController Ctrl;
         public void CreateAndCompileModel()
         {
             Console.WriteLine("Creating model");
@@ -26,7 +26,7 @@ namespace MLProject1
             SoftmaxActivation softmaxActivation = new SoftmaxActivation();
             SigmoidActivation sigmoidActivation = new SigmoidActivation();
 
-            model = new ConvolutionalNeuralNetwork(imgSize);
+            model = new ConvolutionalNeuralNetwork(imgSize, "rgb");
             model.Add(new ConvolutionalLayer(32, 5, reluActivation, "same"));
             model.Add(new MaxPoolingLayer());
             model.Add(new ConvolutionalLayer(64, 3, reluActivation, "same"));
@@ -83,10 +83,10 @@ namespace MLProject1
             ReluActivation reluActivation = new ReluActivation();
             SoftmaxActivation softmaxActivation = new SoftmaxActivation();
 
-            model = new ConvolutionalNeuralNetwork(imgSize);
-            model.Add(new ConvolutionalLayer(5, 5, reluActivation, "same"));
+            model = new ConvolutionalNeuralNetwork(imgSize,"rgb");
+            model.Add(new ConvolutionalLayer(5, 5, reluActivation, "valid"));
             model.Add(new MaxPoolingLayer());
-            model.Add(new ConvolutionalLayer(5, 3, reluActivation, "same"));
+            model.Add(new ConvolutionalLayer(5, 3, reluActivation, "valid"));
             model.Add(new MaxPoolingLayer());
             model.Add(new DropoutLayer(0.2));
             model.Add(new FlattenLayer());
@@ -110,7 +110,7 @@ namespace MLProject1
             ReluActivation reluActivation = new ReluActivation();
             SoftmaxActivation softmaxActivation = new SoftmaxActivation();
 
-            model = new ConvolutionalNeuralNetwork(imgSize);
+            model = new ConvolutionalNeuralNetwork(imgSize, "rgb");
             model.Add(new ConvolutionalLayer(5, 5, reluActivation, "same"));
             model.Add(new MaxPoolingLayer());
             model.Add(new ConvolutionalLayer(5, 3, reluActivation, "same"));
@@ -127,12 +127,83 @@ namespace MLProject1
             Console.WriteLine("Model compiled");
         }
 
+        public void CreateAndCompileModel5()
+        {
+            Console.WriteLine("Creating model");
+            GlobalRandom.InitializeRandom();
+
+            int imgSize = 75;
+
+            ReluActivation reluActivation = new ReluActivation();
+            SoftmaxActivation softmaxActivation = new SoftmaxActivation();
+
+            model = new ConvolutionalNeuralNetwork(imgSize, "grayscale");
+            model.Add(new ConvolutionalLayer(8, 5, reluActivation, "same"));
+            model.Add(new MaxPoolingLayer());
+            model.Add(new DropoutLayer(0.2));
+            model.Add(new FlattenLayer());
+            model.Add(new DenseLayer(26, softmaxActivation));
+
+            Console.WriteLine("Model created");
+
+            model.Compile();
+
+            Console.WriteLine("Model compiled");
+        }
+
+        public void CreateAndCompileModel6()
+        {
+            Console.WriteLine("Creating model");
+            GlobalRandom.InitializeRandom();
+
+            int imgSize = 75;
+
+            ReluActivation reluActivation = new ReluActivation();
+            SoftmaxActivation softmaxActivation = new SoftmaxActivation();
+
+            model = new ConvolutionalNeuralNetwork(imgSize, "grayscale");
+            model.Add(new ConvolutionalLayer(8, 5, reluActivation, "valid"));
+            model.Add(new MaxPoolingLayer());
+            model.Add(new DropoutLayer(0.2));
+            model.Add(new FlattenLayer());
+            model.Add(new DenseLayer(26, softmaxActivation));
+
+            Console.WriteLine("Model created");
+
+            model.Compile();
+
+            Console.WriteLine("Model compiled");
+        }
+
+        public void CreateAndCompileModelMnist()
+        {
+            Console.WriteLine("Creating model");
+            GlobalRandom.InitializeRandom();
+
+            int imgSize = 28;
+
+            NoActivation noActivation = new NoActivation();
+            SoftmaxActivation softmaxActivation = new SoftmaxActivation();
+
+            model = new ConvolutionalNeuralNetwork(imgSize, "grayscale");
+            model.Add(new ConvolutionalLayer(8, 3, noActivation, "valid"));
+            model.Add(new MaxPoolingLayer());
+            model.Add(new FlattenLayer());
+            model.Add(new DenseLayer(10, softmaxActivation));
+
+            Console.WriteLine("Model created");
+
+            model.Compile();
+
+            Console.WriteLine("Model compiled");
+        }
+
         public void CreateAndCompileModel(string jsonPath, string weightsDirectory)
         {
             Console.WriteLine("Creating model");
             GlobalRandom.InitializeRandom();
 
-            model = new ConvolutionalNeuralNetwork(jsonPath, "");
+            model = new ConvolutionalNeuralNetwork(jsonPath);
 
             Console.WriteLine("Model created");
 
@@ -147,7 +218,7 @@ namespace MLProject1
 
         public char RecogniseImage(Bitmap img)
         {
-            double[] resultProbs = model.RecogniseImage(ImageProcessing.GetNormalizedFilteredImage(img));
+            double[] resultProbs = model.RecogniseImage(ImageProcessing.GetNormalizedGrayscaleFilteredImage(img));
             int maxi = -1;
             double maxx = -1;
 
@@ -163,64 +234,72 @@ namespace MLProject1
             return (char)('A' + maxi);
         }
 
-        public EvaluationMetrics Evaluate(List<InputOutputPair> set)
+        public EvaluationMetrics EvaluateMetrics(List<InputOutputPair> set)
         {
             Console.WriteLine("Evaluating");
-            //return model.Evaluate(set);
+            //return model.EvaluateMetrics(set);
             return model.EvaluateParallel(set);
+        }
+
+        public double Evaluate(List<InputOutputPair> set)
+        {
+            Console.WriteLine("Evaluating");
+            return model.Evaluate(set);
+            //return model.EvaluateParallel(set);
         }
 
         public void Test(int process)
         {
-            EvaluationMetrics metrics = Evaluate(Repo.TestingSetPaths);
+            EvaluationMetrics metrics = EvaluateMetrics(Ctrl.Repo.TestingSetPaths);
 
-            Console.WriteLine("Process " + process + " Testing Accuracy: " + metrics.Accuracy + ", Testing Error: " + metrics.Error);
+            Console.WriteLine("Process " + process + " Testing Accuracy: " + metrics.OverallAccuracy);
         }
 
         public void Train(int batchSize, string weightDirectory, int process, double learningRate)
         {
-            int batchNumber = Repo.TrainingSetPaths.Count / batchSize;
+            int batchNumber = Ctrl.Repo.TrainingSetPaths.Count / batchSize;
 
-            double accuracy = 0;
+            double accuracy = 0.27;
 
-            bool keepGoing = true;
-
-            while (keepGoing)
-            {
-                for (int batch = 0; batch < batchNumber; batch++)
+            for (int batch = 0; batch < batchNumber; batch++)
                 {
                     int startPos = batch * batchSize;
 
                     Console.WriteLine("Process " + process + " Training batch: " + batch);
-                    model.Train(Repo.TrainingSetPaths.Skip(startPos).Take(batchSize).ToList(), learningRate);
-                    EvaluationMetrics metrics = Evaluate(Repo.ValidationSetPaths);
-                    if (metrics.Accuracy > accuracy)
+                    model.Train(Ctrl.Repo.TrainingSetPaths.Skip(startPos).Take(batchSize).ToList(), learningRate);
+                    double modelAccuracy = Evaluate(Ctrl.Repo.ValidationSetPaths);
+                    if (modelAccuracy > accuracy)
                     {
                         WriteWeightsToDirectory(weightDirectory);
-                        accuracy = metrics.Accuracy;
+                        accuracy = modelAccuracy;
                     }
-                    Console.WriteLine("Process " + process + " Accuracy: " + metrics.Accuracy);
-                    if (metrics.Accuracy >= 0.90)
+                    Console.WriteLine("Process " + process + " Accuracy: " + modelAccuracy);
+                    if (modelAccuracy >= 0.90)
                     {
                         WriteWeightsToDirectory("bestWeights" + process);
                         Console.WriteLine("Process " + process + " Accuracy over 90% achieved!");
 
-                        metrics = Evaluate(Repo.TestingSetPaths);
-                        if(metrics.Accuracy >= 0.90)
+                    modelAccuracy = Evaluate(Ctrl.Repo.TestingSetPaths);
+                        if(modelAccuracy >= 0.90)
                         {
                             Console.WriteLine("Process " + process + " Testing accuracy over 90% achieved!");
-                            keepGoing = false;
                             break;
                         }
                     }
 
-                    if (batch % 50 == 0)
+                    if (batch % 50 == 0 && batch > 0)
                     {
-                        metrics = Evaluate(Repo.TestingSetPaths);
-                        Console.WriteLine("Process " + process + " Testing accuracy: " + metrics.Accuracy);
+                    modelAccuracy = Evaluate(Ctrl.Repo.TestingSetPaths);
+                        Console.WriteLine("Process " + process + " Testing accuracy: " + modelAccuracy);
                     }
                 }
-            }
+        }
+
+        public void TrainOneMnist(double learningRate)
+        {
+            InputOutputPair pair = new InputOutputPair("E:\\Programs\\MNIST-JPG-master\\output\\training\\0\\1.jpg",
+                "E:\\Programs\\MNIST-JPG-master\\output\\training\\0");
+            model.TrainMnist(pair, learningRate);
         }
 
         public void WriteToFile(string modelFile, string weightsDirectory)
@@ -325,19 +404,41 @@ namespace MLProject1
         public void PrepareImageSets(string trainingPath, string testingPath, string validationPath)
         {
             Console.WriteLine("Preparing dataset");
-            Repo = new ImageRepository();
-            ImageController ctrl = new ImageController(Repo);
+            ImageRepository Repo = new ImageRepository();
+            Ctrl = new ImageController(Repo);
 
-            Task t1 = Task.Run(() => { ctrl.ReadSet("train", trainingPath); });
-            Task t2 = Task.Run(() => { ctrl.ReadSet("test", testingPath); });
-            Task t3 = Task.Run(() => { ctrl.ReadSet("valid", validationPath); });
+            Task t1 = Task.Run(() => { Ctrl.ReadSet("train", trainingPath); });
+            Task t2 = Task.Run(() => { Ctrl.ReadSet("test", testingPath); });
+            Task t3 = Task.Run(() => { Ctrl.ReadSet("valid", validationPath); });
 
             t1.Wait();
             t2.Wait();
             t3.Wait();
 
+
+            //Ctrl.ReadSet("train", trainingPath);
+            //Ctrl.ReadSet("test", testingPath);
+            //Ctrl.ReadSet("valid", validationPath);
+
             Console.WriteLine("Shuffling sets");
-            ctrl.ShuffleSets();
+            ShuffleSets();
+        }
+
+        public void ShuffleSets()
+        {
+            Ctrl.ShuffleSets();
+        }
+
+        public void EvaluateModel()
+        {
+            EvaluationMetrics training = EvaluateMetrics(Ctrl.Repo.TrainingSetPaths);
+            File.WriteAllText("TrainingPerformance.json", JsonConvert.SerializeObject(training));
+
+            EvaluationMetrics testing = EvaluateMetrics(Ctrl.Repo.TestingSetPaths);
+            File.WriteAllText("TestingPerformance.json", JsonConvert.SerializeObject(testing));
+
+            EvaluationMetrics validation = EvaluateMetrics(Ctrl.Repo.ValidationSetPaths);
+            File.WriteAllText("ValidationPerformance.json", JsonConvert.SerializeObject(validation));
         }
     }
 }

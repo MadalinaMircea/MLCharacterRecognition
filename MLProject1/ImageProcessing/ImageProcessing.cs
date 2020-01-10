@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1
 {
-    class ImageProcessing
+    public class ImageProcessing
     {
         public static Bitmap CreateInitialImage(int width, int height)
         {
@@ -118,12 +118,20 @@ namespace MLProject1
                     for (int j = 0; j < bitmap.Height; j++)
                     {
                         Color color = bmp.GetPixel(j, i);
-                        values[index] = (255 - color.R) / 255.0;
+                        //values[index] = (255 - color.R) / 255.0;
+                        //index++;
+                        //values[index] = (255 - color.G) / 255.0;
+                        //index++;
+                        //values[index] = (255 - color.B) / 255.0;
+                        //index++;
+
+                        values[index] = color.R / 255.0;
                         index++;
-                        values[index] = (255 - color.G) / 255.0;
+                        values[index] = color.G / 255.0;
                         index++;
-                        values[index] = (255 - color.B) / 255.0;
+                        values[index] = color.B / 255.0;
                         index++;
+
                     }
                 }
 
@@ -150,7 +158,8 @@ namespace MLProject1
                     for (int j = 0; j < bitmap.Height; j++)
                     {
                         Color color = bmp.GetPixel(j, i);
-                        values[index] = (255 - (color.R + color.G + color.B) / 3) / 255.0;
+                        //values[index] = (255 - (color.R + color.G + color.B) / 3) / 255.0;
+                        values[index] = ((color.R + color.G + color.B) / 3) / 255.0;
                         index++;
                     }
                 }
@@ -429,13 +438,13 @@ namespace MLProject1
                     for (int j = 0; j < bitmap.Height; j++)
                     {
                         Color color = bitmap.GetPixel(j, i);
-                        //redChannel[i, j] = color.R / 255.0;
-                        //greenChannel[i, j] = color.G / 255.0;
-                        //blueChannel[i, j] = color.B / 255.0;
+                        redChannel[i, j] = (255 - color.R) / 255.0 - 0.5;
+                        greenChannel[i, j] = (255 - color.G) / 255.0 - 0.5;
+                        blueChannel[i, j] = (255 - color.B) / 255.0 - 0.5;
 
-                        redChannel[i, j] = (255 - color.R) / 255.0;
-                        greenChannel[i, j] = (255 - color.G) / 255.0;
-                        blueChannel[i, j] = (255 - color.B) / 255.0;
+                        //redChannel[i, j] = (255 - color.R) / 255.0;
+                        //greenChannel[i, j] = (255 - color.G) / 255.0;
+                        //blueChannel[i, j] = (255 - color.B) / 255.0;
                     }
                 }
 
@@ -445,6 +454,35 @@ namespace MLProject1
 
 
                 FilteredImage image = new FilteredImage(3, channels);
+
+                return image;
+            }
+        }
+
+        public static FilteredImage GetNormalizedMnist(Bitmap bitmap)
+        {
+            using (Bitmap bmp = new Bitmap(bitmap))
+            {
+                int height = bitmap.Height;
+
+                FilteredImageChannel[] channels = new FilteredImageChannel[1];
+
+                double[,] channel = new double[height, height];
+
+
+                for (int i = 0; i < bitmap.Height; i++)
+                {
+                    for (int j = 0; j < bitmap.Height; j++)
+                    {
+                        Color color = bitmap.GetPixel(j, i);
+                        channel[i, j] = ((color.R + color.G + color.B) / 3) / 255.0 - 0.5;
+                    }
+                }
+
+                channels[0] = new FilteredImageChannel(height, channel);
+
+
+                FilteredImage image = new FilteredImage(1, channels);
 
                 return image;
             }
@@ -470,7 +508,7 @@ namespace MLProject1
                         //greenChannel[i, j] = color.G / 255.0;
                         //blueChannel[i, j] = color.B / 255.0;
 
-                        channel[i, j] = (255 - (color.R + color.G + color.B) / 3) / 255.0;
+                        channel[i, j] = (255 - ((color.R + color.G + color.B) / 3)) / 255.0 - 0.5;
                     }
                 }
 

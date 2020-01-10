@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace MLProject1.CNN
 {
     [Serializable]
-    class FlattenLayer : NetworkLayer
+    public class FlattenLayer : NetworkLayer
     {
         [JsonIgnore]
         public FlattenedImage Output { get; set; }
@@ -27,11 +27,25 @@ namespace MLProject1.CNN
             FilteredImage image = (FilteredImage)PreviousLayer.GetData();
             int outputIndex = 0;
 
-            for(int channel = 0; channel < image.NumberOfChannels; channel++)
+            //for(int valuesI = 0; valuesI < image.Size; valuesI++)
+            //     {
+            //     for (int valuesJ = 0; valuesJ < image.Size; valuesJ++)
+            //     {
+            //         for (int channel = 0; channel < image.NumberOfChannels; channel++)
+            //         {
+
+            //             Output.Values[outputIndex] = image.Channels[channel].Values[valuesI, valuesJ];
+            //             outputIndex++;
+            //         }
+            //     }
+            //     }
+
+            for (int channel = 0; channel < image.NumberOfChannels; channel++)
             {
-                for(int valuesI = 0; valuesI < image.Size; valuesI++)
+
+                for (int valuesI = 0; valuesI < image.Size; valuesI++)
                 {
-                    for(int valuesJ = 0; valuesJ < image.Size; valuesJ++)
+                    for (int valuesJ = 0; valuesJ < image.Size; valuesJ++)
                     {
                         Output.Values[outputIndex] = image.Channels[channel].Values[valuesI, valuesJ];
                         outputIndex++;
@@ -64,7 +78,7 @@ namespace MLProject1.CNN
                 {
                     for (int valuesJ = 0; valuesJ < image.Size; valuesJ++)
                     {
-                        values[valuesI, valuesJ] = ((FlattenedImage)nextOutput[outputIndex]).Values.Sum();
+                        values[valuesI, valuesJ] = nextOutput[outputIndex].Sum();
                         outputIndex++;
                     }
                 }

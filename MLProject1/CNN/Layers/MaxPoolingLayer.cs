@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class MaxPoolingLayer : NetworkLayer
+    public class MaxPoolingLayer : NetworkLayer
     {
         public int Pool { get; }
 
@@ -27,33 +27,43 @@ namespace MLProject1.CNN
             int inputSize = input.Size;
             int outputSize = inputSize / Pool;
 
-            for(int i = 0; i < input.NumberOfChannels; i++)
-            {
-                outputChannels[i] = new FilteredImageChannel(outputSize);
-            }
-            
-            for (int channelI = 0; channelI + Pool < inputSize; channelI += Pool)
-            {
-                for(int channelJ = 0; channelJ + Pool < inputSize; channelJ += Pool)
-                {
-                    for(int poolI = 0; poolI < Pool; poolI++)
-                    {
-                        for(int poolJ = 0; poolJ < Pool; poolJ++)
-                        {
-                            for (int channel = 0; channel < input.NumberOfChannels; channel++)
-                            {
-                                FilteredImageChannel auxInput = input.Channels[channel];
-                                FilteredImageChannel auxOutput = outputChannels[channel];
+            Task[] tasks = new Task[input.NumberOfChannels];
 
-                                if (auxOutput.Values[channelI / Pool, channelJ / Pool] < auxInput.Values[channelI + poolI, channelJ + poolJ])
+            for (int channel = 0; channel < input.NumberOfChannels; channel++)
+            {
+                int taskc = 0 + channel;
+
+                tasks[taskc] = Task.Run(() =>
+                {
+                    FilteredImageChannel auxInput = input.Channels[taskc];
+
+                    double[,] outputValues = new double[outputSize, outputSize];
+
+                    for (int channelI = 0; channelI + Pool <= inputSize; channelI += Pool)
+                    {
+                        for (int channelJ = 0; channelJ + Pool <= inputSize; channelJ += Pool)
+                        {
+                            double maxx = auxInput.Values[channelI, channelJ];
+
+                            for (int poolI = 0; poolI < Pool; poolI++)
+                            {
+                                for (int poolJ = 0; poolJ < Pool; poolJ++)
                                 {
-                                    auxOutput.Values[channelI / Pool, channelJ / Pool] = auxInput.Values[channelI + poolI, channelJ + poolJ];
+                                    if (maxx < auxInput.Values[channelI + poolI, channelJ + poolJ])
+                                    {
+                                        maxx = auxInput.Values[channelI + poolI, channelJ + poolJ];
+                                    }
                                 }
                             }
+
+                            outputValues[channelI / Pool, channelJ / Pool] = maxx;
                         }
                     }
-                }
+                    outputChannels[taskc] = new FilteredImageChannel(outputSize, outputValues);
+                });
             }
+
+            Task.WaitAll(tasks);
 
             Output = new FilteredImage(input.NumberOfChannels, outputChannels);
         }
@@ -94,12 +104,12 @@ namespace MLProject1.CNN
 
                 tasks[taskc] = Task.Run(() =>
                {
-                   for (int channelI = 0; channelI + Pool < outputSize; channelI += Pool)
+                   for (int channelI = 0; channelI + Pool <= outputSize; channelI += Pool)
                    {
-                       for (int channelJ = 0; channelJ + Pool < outputSize; channelJ += Pool)
+                       for (int channelJ = 0; channelJ + Pool <= outputSize; channelJ += Pool)
                        {
                            int maxi = 0, maxj = 0;
-                           double maxx = input.Channels[taskc].Values[0, 0];
+                           double maxx = input.Channels[taskc].Values[channelI, channelJ];
 
                            for (int poolI = 0; poolI < Pool; poolI++)
                            {

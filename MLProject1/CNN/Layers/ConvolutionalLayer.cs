@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace MLProject1.CNN
 {
     [Serializable]
-    class ConvolutionalLayer : NetworkLayer
+    public class ConvolutionalLayer : NetworkLayer
     {
         public int FilterNumber { get; }
 
@@ -20,6 +20,9 @@ namespace MLProject1.CNN
 
         [JsonIgnore]
         public FilteredImage OutputImage { get; set; }
+
+        [JsonIgnore]
+        public FilteredImage OutputBeforeActivation { get; set; }
 
         public string Padding { get; set; }
 
@@ -52,6 +55,10 @@ namespace MLProject1.CNN
             {
                 ActivationFunction = new SigmoidActivation();
             }
+            else if (activationFunction == "no")
+            {
+                ActivationFunction = new NoActivation();
+            }
 
             Filters = new Filter[filterNumber];
 
@@ -78,6 +85,7 @@ namespace MLProject1.CNN
 
             bool samePadding = (Padding == "same") ? true : false;
 
+
             Task[] tasks = new Task[FilterNumber];
 
             for (int i = 0; i < FilterNumber; i++)
@@ -92,14 +100,15 @@ namespace MLProject1.CNN
 
             Task.WaitAll(tasks);
 
-            
+
 
             //for (int i = 0; i < FilterNumber; i++)
             //{
             //    channels[i] = Filters[i].Convolve(img, samePadding);
             //}
 
-            OutputImage = ActivationFunction.Activate(new FilteredImage(FilterNumber, channels));
+            OutputBeforeActivation = new FilteredImage(FilterNumber, channels);
+            OutputImage = ActivationFunction.Activate(OutputBeforeActivation);
         }
 
         public override void CompileLayer(NetworkLayer previousLayer)
@@ -130,17 +139,17 @@ namespace MLProject1.CNN
             FilteredImage previous = (FilteredImage)PreviousLayer.GetData();
 
             FilteredImage nextErrors = (FilteredImage)nextOutput[0];
-            FilteredImage activationDerivatives = ActivationFunction.GetDerivative(OutputImage);
 
-            for(int i = 0; i < nextErrors.NumberOfChannels; i++)
+            FilteredImage activationDerivatives = ActivationFunction.GetDerivative(OutputBeforeActivation);
+
+            for (int i = 0; i < nextErrors.NumberOfChannels; i++)
             {
-                for(int j = 0; j < nextErrors.Size; j++)
+                for (int j = 0; j < nextErrors.Size; j++)
                 {
 
-                    for(int k = 0; k < nextErrors.Size; k++)
+                    for (int k = 0; k < nextErrors.Size; k++)
                     {
-                        nextErrors.Channels[i].Values[j, k] = 
-                            nextErrors.Channels[i].Values[j, k] * activationDerivatives.Channels[i].Values[j, k];
+                        nextErrors.Channels[i].Values[j, k] *= activationDerivatives.Channels[i].Values[j, k];
                     }
                 }
             }
@@ -156,11 +165,12 @@ namespace MLProject1.CNN
                 tasks[taski] = Task.Run(() =>
                 {
                     newErrors[taski] = Filters[taski].Backpropagate(previous,
-                        nextErrors.Channels[taski], learningRate, samePadding);
+                       nextErrors.Channels[taski], learningRate, samePadding);
                 });
             }
 
             Task.WaitAll(tasks);
+
 
             //for (int i = 0; i < FilterNumber; i++)
             //{

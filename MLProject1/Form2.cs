@@ -1,5 +1,7 @@
-﻿using MLProject1.CNN;
+﻿using Keras.Datasets;
+using MLProject1.CNN;
 using Newtonsoft.Json;
+using Numpy;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,9 +36,7 @@ namespace MLProject1
         string newImagePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\UnityCNN\\image2.jpg";
         string responsePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\UnityCNN\\image.txt";
 
-        KerasController ctrl = new KerasController("smallModel.json", "smallBest.h5");
-
-        public string GetPrediction()
+        public char GetPrediction(KerasController ctrl)
         {
             using (Bitmap img = new Bitmap(imagePath))
             {
@@ -46,7 +46,20 @@ namespace MLProject1
 
                 img.Dispose();
 
-                return ctrl.RecogniseImage(newImagePath).ToString();
+                return ctrl.RecogniseImage(newImagePath);
+            }
+        }
+
+        public char GetPrediction(CNNController ctrl)
+        {
+            using (Bitmap img = new Bitmap(imagePath))
+            {
+                Bitmap bmp = ImageProcessing.CropWhite(img, 75, 75);
+                bmp.RotateFlip(RotateFlipType.Rotate180FlipNone);
+
+                img.Dispose();
+
+                return ctrl.RecogniseImage(bmp);
             }
         }
 
@@ -61,19 +74,37 @@ namespace MLProject1
 
             //StartCNNForUnity();
 
-           // StartKerasForUnity();
+            //StartKerasForUnity();
 
-            StartCNNForForm();
+            //StartCNNForForm();
+
+            //StartTrainingMnist();
+
+            //StartTrainingTasks();
+
+            //StartTrainingCNN();
+
+            //EvaluateCNN();
 
             ClearPicture();
+
+            //StartCNNForForm();
+
+            ConfusionMatrixForm form = new ConfusionMatrixForm();
+            form.Show();
 
         }
 
         private void StartCNNForForm()
         {
-            GlobalRandom.InitializeRandom();
+            //controller.CreateAndCompileModel3();
+            //controller.WriteToFile("modelCorrectFinal.json", "modelCorrectFinal");
 
-            controller.CreateAndCompileModel("modelCorrect.json", "modelCorrect");
+            //controller.PrepareImageSets("data/Train", "data/Test", "data/Valid");
+
+            //controller.Train(408, "modelCorrectFinal", 1, 0.1);
+
+            controller.CreateAndCompileModel("model6final.json", "model6final2");
         }
 
         private void StartTrainingTasks()
@@ -85,13 +116,13 @@ namespace MLProject1
                 try
                 {
                     CNNController ctrl = new CNNController();
-                    ctrl.CreateAndCompileModel2();
-                    ctrl.WriteToFile("model1.json", "model1");
+                    ctrl.CreateAndCompileModel5();
+                    ctrl.WriteToFile("model5final.json", "model5final");
                     ctrl.PrepareImageSets("data/Train", "data/Test", "data/Valid");
 
                     //ctrl.Test(1);
 
-                    ctrl.Train(208, "model1", 1, 0.05);
+                    ctrl.Train(208, "model5final", 1, 0.05);
                 }
                 catch (Exception ex)
                 {
@@ -104,13 +135,13 @@ namespace MLProject1
                 try
                 {
                     CNNController ctrl = new CNNController();
-                    ctrl.CreateAndCompileModel3();
-                    ctrl.WriteToFile("model2.json", "model2");
+                    ctrl.CreateAndCompileModel6();
+                    ctrl.WriteToFile("model6final.json", "model6final");
                     ctrl.PrepareImageSets("data/Train", "data/Test", "data/Valid");
 
                     ctrl.Test(2);
 
-                    ctrl.Train(416, "model2", 2, 0.05);
+                    ctrl.Train(416, "model6final", 2, 0.005);
                 }
                 catch (Exception ex)
                 {
@@ -123,6 +154,8 @@ namespace MLProject1
 
         private void StartKerasForUnity()
         {
+            KerasController ctrl = new KerasController("smallModelBest.json", "smallBest.h5");
+
             while (true)
             {
                 if (File.Exists(imagePath))
@@ -130,7 +163,9 @@ namespace MLProject1
                     try
                     {
                         Thread.Sleep(500);
-                        File.WriteAllText(responsePath, GetPrediction());
+                        char c = GetPrediction(ctrl);
+                        File.WriteAllText(responsePath, c.ToString());
+                        Console.WriteLine("Predicted: " + c);
                         File.Delete(newImagePath);
                         File.Delete(imagePath);
                     }
@@ -144,9 +179,8 @@ namespace MLProject1
 
         private void StartCNNForUnity()
         {
-            GlobalRandom.InitializeRandom();
-
-            controller.CreateAndCompileModel("modelCorrect.json", "modelCorrect");
+            controller.CreateAndCompileModel("model6final.json", "model6final2");
+            Console.WriteLine("Ready");
 
             while (true)
             {
@@ -155,7 +189,9 @@ namespace MLProject1
                     try
                     {
                         Thread.Sleep(500);
-                        File.WriteAllText(responsePath, GetPrediction());
+                        char c = GetPrediction(controller);
+                        File.WriteAllText(responsePath, c.ToString());
+                        Console.WriteLine("Predicted: " + c);
                         File.Delete(newImagePath);
                         File.Delete(imagePath);
                     }
@@ -169,16 +205,54 @@ namespace MLProject1
 
         private void StartTrainingCNN()
         {
-            GlobalRandom.InitializeRandom();
+            CNNController ctrl = new CNNController();
 
-            controller.CreateAndCompileModel3();
-            controller.WriteToFile("newModel.json", "newModel");
+            ctrl.CreateAndCompileModel("model6final.json", "model6final2");
 
-            controller.PrepareImageSets("data/Train", "data/Test", "data/Valid");
+            //ctrl.WriteToFile();
+            ctrl.PrepareImageSets("data/Train", "data/Test", "data/Valid");
 
-            controller.Train(208, "trainedWeights", 1, 0.05);
+            //ctrl.Test(2);
 
-            controller.Test(1);
+            while (true)
+            {
+                try
+                {
+                    ctrl.Train(416, "model6final2", 2, 0.000025);
+                }
+                catch(Exception e)
+                {
+                    ctrl.CreateAndCompileModel("model6final.json", "model6final2");
+                }
+
+                ctrl.ShuffleSets();
+            }
+
+        }
+
+        private void EvaluateCNN()
+        {
+            CNNController ctrl = new CNNController();
+
+            ctrl.CreateAndCompileModel("model6final.json", "model6final2");
+
+            ctrl.PrepareImageSets("data/Train", "data/Test", "data/Valid");
+
+            ctrl.EvaluateModel();
+        }
+
+        private void StartTrainingMnist()
+        {
+            controller.CreateAndCompileModel("mnist.json", "mnist");
+
+            controller.PrepareImageSets("E:\\Programs\\MNIST-JPG-master\\output\\training", 
+                "E:\\Programs\\MNIST-JPG-master\\output\\testing", "E:\\Programs\\MNIST-JPG-master\\output\\testing");
+
+            controller.TrainOneMnist(0.005);
+
+            //controller.Train(52, "trainedWeights", 1, 0.005);
+
+            //controller.Test(1);
 
         }
 

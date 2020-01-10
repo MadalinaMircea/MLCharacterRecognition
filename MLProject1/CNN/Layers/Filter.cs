@@ -9,25 +9,13 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class Filter
+    public class Filter
     {
         public Kernel[] Kernels { get; set; }
         public int KernelNumber { get; set; }
         public int KernelSize { get; set; }
 
-        public double Bias { get; set; }
-
         [JsonConstructor]
-        public Filter(int kernelNumber, int kernelSize, double bias)
-        {
-            KernelNumber = kernelNumber;
-            KernelSize = kernelSize;
-            Kernels = new Kernel[KernelNumber];
-            InitializeRandom();
-
-            Bias = bias;
-        }
-
         public Filter(int kernelNumber, int kernelSize)
         {
             KernelNumber = kernelNumber;
@@ -42,8 +30,6 @@ namespace MLProject1.CNN
             {
                 Kernels[i] = new Kernel(KernelSize);
             }
-
-            Bias = GlobalRandom.GetRandomWeight();
         }
         public FilteredImageChannel Convolve(FilteredImage input, bool samePadding)
         {
@@ -61,6 +47,7 @@ namespace MLProject1.CNN
             double[,] values = new double[resultSize, resultSize];
 
             double[,] kernelOutput;
+
 
             Task[] tasks = new Task[KernelNumber];
 
@@ -86,6 +73,7 @@ namespace MLProject1.CNN
 
             Task.WaitAll(tasks);
 
+
             //for (int i = 0; i < input.NumberOfChannels; i++)
             //{
             //    kernelOutput = Kernels[i].Convolve(input.Channels[i], samePadding);
@@ -98,14 +86,6 @@ namespace MLProject1.CNN
             //        }
             //    }
             //}
-
-            for (int outputI = 0; outputI < resultSize; outputI++)
-            {
-                for (int outputJ = 0; outputJ < resultSize; outputJ++)
-                {
-                    values[outputI, outputJ] += Bias;
-                }
-            }
 
             return new FilteredImageChannel(resultSize, values);
         }

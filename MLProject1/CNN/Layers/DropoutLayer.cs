@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace MLProject1.CNN
 {
     [Serializable]
-    class DropoutLayer : NetworkLayer
+    public class DropoutLayer : NetworkLayer
     {
         public double Rate { get; set; }
 

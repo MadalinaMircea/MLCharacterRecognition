@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace MLProject1.CNN
 {
     [JsonConverter(typeof(ToStringJsonConverter))]
-    class SigmoidActivation : PiecewiseActivation
+    public class SigmoidActivation : PiecewiseActivation
     {
         public override double ActivateValue(double v)
         {

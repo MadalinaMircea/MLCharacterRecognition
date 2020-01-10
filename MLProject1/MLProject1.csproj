@@ -65,7 +65,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CNNController.cs" />
+    <Compile Include="CNN\Activations\NoActivation.cs" />
     <Compile Include="CNN\Utils\EvaluationMetrics.cs" />
+    <Compile Include="ConfusionMatrixForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfusionMatrixForm.Designer.cs">
+      <DependentUpon>ConfusionMatrixForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ImageProcessing\FilteredImage.cs" />
     <Compile Include="ImageProcessing\FilteredImageChannel.cs" />
     <Compile Include="ImageProcessing\FlattenedImage.cs" />
@@ -102,6 +109,9 @@
     <Compile Include="KerasController.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="ConfusionMatrixForm.resx">
+      <DependentUpon>ConfusionMatrixForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form2.resx">
       <DependentUpon>Form2.cs</DependentUpon>
     </EmbeddedResource>
@@ -114,6 +124,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

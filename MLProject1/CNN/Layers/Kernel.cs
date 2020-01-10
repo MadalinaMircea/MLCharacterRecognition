@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class Kernel
+    public class Kernel
     {
         public double[,] Values { get; set; }
         public int Size { get; set; }
@@ -24,13 +24,13 @@ namespace MLProject1.CNN
             Size = size;
             Values = values;
 
-            ComputeElementSum();
+           // ComputeElementSum();
         }
 
-        private void ComputeElementSum()
-        {
-            ElementSum = MatrixUtils.ElementSum(Values);
-        }
+        //private void ComputeElementSum()
+        //{
+        //    ElementSum = MatrixUtils.ElementSum(Values);
+        //}
 
         public Kernel(int size)
         {
@@ -38,18 +38,20 @@ namespace MLProject1.CNN
                 throw new Exception("Filter cannot have even size.");
             Size = size;
             InitializeRandom();
-            ComputeElementSum();
+            //ComputeElementSum();
         }
 
         private void InitializeRandom()
         {
             Values = new double[Size, Size];
+
+            int squaredSize = Size * Size;
             
             for (int i = 0; i < Size; i++)
             {
                 for (int j = 0; j < Size; j++)
                 {
-                    Values[i, j] = GlobalRandom.GetRandomWeight();
+                    Values[i, j] = GlobalRandom.GetRandomWeight() / squaredSize;
                 }
             }
         }
@@ -79,50 +81,101 @@ namespace MLProject1.CNN
 
         public FilteredImageChannel Backpropagate(FilteredImageChannel previous, FilteredImageChannel nextErrors, int totalKernels, double learningRate, bool samePadding)
         {
-            double[,] kernelDerivatives = new double[1,1];
+            //double[,] kernelDerivatives = new double[1,1];
 
-            Task t = Task.Run(() =>
+            //Task t = Task.Run(() =>
+            //{
+            //    if (samePadding)
+            //    {
+            //        kernelDerivatives = MatrixUtils.ConvolveSame(previous.Values, nextErrors.Values);
+            //    }
+            //    else
+            //    {
+            //        kernelDerivatives = MatrixUtils.Convolve(previous.Values, nextErrors.Values);
+            //    }
+            //});
+
+            //double[,] flippedKernel = MatrixUtils.Rotate180(Values);
+
+            ////double[,] newErrors = MatrixUtils.Convolve(flippedKernel, nextErrors.Values);
+
+            //double[,] newErrors;
+
+            //if (samePadding)
+            //{
+            //    newErrors = MatrixUtils.FullConvolutionSame(flippedKernel, nextErrors.Values);
+            //}
+            //else
+            //{
+            //    newErrors = MatrixUtils.FullConvolution(flippedKernel, nextErrors.Values);
+            //}
+
+
+
+            //t.Wait();
+
+            //for (int i = 0; i < Size; i++)
+            //{
+            //    for(int j = 0; j < Size; j++)
+            //    {
+            //        Values[i, j] -= learningRate * kernelDerivatives[i, j];
+            //    }
+            //}
+
+            //ComputeElementSum();
+
+            //return new FilteredImageChannel(Size, newErrors);
+
+            //double[,] flippedErrors = MatrixUtils.Rotate180(nextErrors.Values);
+
+            double[,] deltaWeights = new double[1, 1];
+
+            Task t1 = Task.Run(() =>
             {
                 if (samePadding)
                 {
-                    kernelDerivatives = MatrixUtils.ConvolveSame(previous.Values, nextErrors.Values);
+                    deltaWeights = MatrixUtils.ConvolveSame(previous.Values, nextErrors.Values);
+
                 }
                 else
                 {
-                    kernelDerivatives = MatrixUtils.Convolve(previous.Values, nextErrors.Values);
+                    deltaWeights = MatrixUtils.Convolve(previous.Values, nextErrors.Values);
                 }
             });
+            
 
-            double[,] flippedKernel = MatrixUtils.Rotate180(Values);
+            //double[,] flippedKernel = MatrixUtils.Rotate180(Values);
 
-            //double[,] newErrors = MatrixUtils.Convolve(flippedKernel, nextErrors.Values);
 
             double[,] newErrors;
 
-            if (samePadding)
+            if(samePadding)
             {
-                newErrors = MatrixUtils.FullConvolutionSame(flippedKernel, nextErrors.Values);
+                newErrors = MatrixUtils.Convolve(Values, nextErrors.Values);
             }
             else
             {
-                newErrors = MatrixUtils.FullConvolution(flippedKernel, nextErrors.Values);
+                newErrors = MatrixUtils.FullConvolution(Values, nextErrors.Values);
             }
 
-            
+            t1.Wait();
 
-            t.Wait();
+            double[,] newWeights = new double[Size, Size];
 
-            for (int i = 0; i < Size; i++)
+            for(int i = 0; i < Size; i++)
             {
                 for(int j = 0; j < Size; j++)
                 {
-                    Values[i, j] -= learningRate * kernelDerivatives[i, j];
+                    newWeights[i, j] = Values[i, j] - learningRate * deltaWeights[i, j];
                 }
             }
 
-            ComputeElementSum();
+            //Values = MatrixUtils.Rotate180(newWeights);
 
-            return new FilteredImageChannel(Size, newErrors);
+            Values = newWeights;
+
+            return new FilteredImageChannel(newErrors.GetLength(0), newErrors);
+
         }
     }
 }

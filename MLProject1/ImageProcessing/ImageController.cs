@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class ImageController
+    public class ImageController
     {
         public ImageRepository Repo { get; set; }
 

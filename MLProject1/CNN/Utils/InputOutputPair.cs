@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class InputOutputPair
+    public class InputOutputPair
     {
         public string Input { get; set; }
         public double[] Output { get; set; }
@@ -25,6 +25,8 @@ namespace MLProject1.CNN
         {
             double[] result = new double[26];
             result[OutputChar - 65] = 1;
+            //double[] result = new double[10];
+            //result[OutputChar - 48] = 1;
 
             return result;
         }

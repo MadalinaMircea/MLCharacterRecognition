@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class ImageRepository
+    public class ImageRepository
     {
         public List<InputOutputPair> TrainingSetPaths { get; set; }
         public List<InputOutputPair> TestingSetPaths { get; set; }

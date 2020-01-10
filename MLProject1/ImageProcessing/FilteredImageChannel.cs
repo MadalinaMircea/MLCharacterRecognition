@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class FilteredImageChannel
+    public class FilteredImageChannel
     {
         public double[,] Values { get; set; }
         public int Size { get; set; }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    static class GlobalRandom
+    public static class GlobalRandom
     {
         private static Random rnd;
 

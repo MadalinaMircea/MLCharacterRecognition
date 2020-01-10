@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace MLProject1.CNN
 {
     [JsonConverter(typeof(ToStringJsonConverter))]
-    class ReluActivation : PiecewiseActivation
+    public class ReluActivation : PiecewiseActivation
     {
         public override string ToString()
         {

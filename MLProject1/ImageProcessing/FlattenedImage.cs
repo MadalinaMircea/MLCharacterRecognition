@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class FlattenedImage : LayerOutput
+    public class FlattenedImage : LayerOutput
     {
         public int Size { get; set; }
         public double[] Values { get; set; }

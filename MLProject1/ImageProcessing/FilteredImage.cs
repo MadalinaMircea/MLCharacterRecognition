@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MLProject1.CNN
 {
-    class FilteredImage : LayerOutput
+    public class FilteredImage : LayerOutput
     {
         public int NumberOfChannels { get; set; }
         public FilteredImageChannel[] Channels { get; set; }
